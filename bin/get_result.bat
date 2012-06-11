@@ -1,0 +1,1 @@
+grep -n ERROR ../archived/*/run.log

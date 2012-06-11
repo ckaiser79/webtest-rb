@@ -1,0 +1,71 @@
+[0.000][INFO]:      ChromeDriver 18.0.1022.0 d:\dev\bin\chromedriver.exe
+[0.265][FINE]:      Initializing session with capabilities {
+   "browserName": "chrome",
+   "chrome.detach": true,
+   "chromeOptions": {
+      "detach": true
+   },
+   "cssSelectorsEnabled": true,
+   "javascriptEnabled": true,
+   "nativeEvents": false,
+   "platform": "ANY",
+   "rotatable": false,
+   "takesScreenshot": false,
+   "version": ""
+}
+
+[0.265][INFO]:      Using named testing interface
+[0.663][INFO]:      Connected to Chrome successfully. Version: 18.0.1025.168
+[0.730][FINE]:      Command received (/session/7e3e4032416e970b2294799fd3555f3e)
+[0.732][FINE]:      Command finished (/session/7e3e4032416e970b2294799fd3555f3e) with response {
+   "sessionId": "7e3e4032416e970b2294799fd3555f3e",
+   "status": 0,
+   "value": {
+      "acceptSslCerts": false,
+      "applicationCacheEnabled": false,
+      "browserConnectionEnabled": false,
+      "browserName": "chrome",
+      "chrome.chromedriverVersion": "18.0.1022.0",
+      "chrome.nativeEvents": false,
+      "cssSelectorsEnabled": true,
+      "databaseEnabled": false,
+      "handlesAlerts": true,
+      "javascriptEnabled": true,
+      "locationContextEnabled": false,
+      "nativeEvents": true,
+      "platform": "windows",
+      "rotatable": false,
+      "takesScreenshot": true,
+      "version": "18.0.1025.168",
+      "webStorageEnabled": false
+   }
+}
+
+[0.741][FINE]:      Command received (/session/7e3e4032416e970b2294799fd3555f3e/url) with params {
+   "url": "http://www.heise.de"
+}
+
+[0.742][FINER]:     Waiting for all views to stop loading...
+[0.742][FINER]:     Done waiting for all views to stop loading
+[6.569][FINER]:     Waiting for all views to stop loading...
+[6.570][FINER]:     Done waiting for all views to stop loading
+[6.570][FINE]:      Command finished (/session/7e3e4032416e970b2294799fd3555f3e/url) with response {
+   "sessionId": "7e3e4032416e970b2294799fd3555f3e",
+   "status": 0,
+   "value": {
+
+   }
+}
+
+[6.581][FINE]:      Command received (/session/7e3e4032416e970b2294799fd3555f3e/url)
+[6.581][FINER]:     Waiting for all views to stop loading...
+[6.583][FINER]:     Done waiting for all views to stop loading
+[6.591][FINER]:     Waiting for all views to stop loading...
+[6.592][FINER]:     Done waiting for all views to stop loading
+[6.592][FINE]:      Command finished (/session/7e3e4032416e970b2294799fd3555f3e/url) with response {
+   "sessionId": "7e3e4032416e970b2294799fd3555f3e",
+   "status": 0,
+   "value": "http://www.heise.de/"
+}
+
+[6.597][FINE]:      Command received (/session/7e3e4032416e970b2294799fd3555f3e)

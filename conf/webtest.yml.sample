@@ -1,0 +1,22 @@
+
+---
+main:
+  verbose: false
+  logdir: log
+  testcase-directory: testcases
+  
+browser-tests:
+  # set to false, if browser should not be closed after testcase automatically
+  autocloseBrowser: true
+  browser-type: chrome
+  #browser-type: firefox
+  #browser-type: ie
+  
+testrun:
+  includes:
+    - heise.de
+    
+data:
+    
+i18n:
+

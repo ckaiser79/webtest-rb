@@ -1,0 +1,15 @@
+
+module Webtest
+	module Browser
+		module Support
+			def clearBrowserCookies(@browser)
+				Watir::CookieManager::WatirHelper.deleteSpecialFolderContents(Watir::CookieManager::WatirHelper::COOKIES) 
+				Watir::CookieManager::WatirHelper.deleteSpecialFolderContents(Watir::CookieManager::WatirHelper::INTERNET_CACHE) 
+			end
+			def clearBrowserCache(@browser)
+				Watir::CookieManager::WatirHelper.deleteSpecialFolderContents(Watir::CookieManager::WatirHelper::COOKIES) 
+				Watir::CookieManager::WatirHelper.deleteSpecialFolderContents(Watir::CookieManager::WatirHelper::INTERNET_CACHE) 
+			end
+		end
+	end
+end
