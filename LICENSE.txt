@@ -1,4 +1,23 @@
 
+= Abstract =
+
+The source code of webtest-rb is licensed under the LGPL
+
+This items are covered by the LGPL:
+ - files and directories in and below direcory bin
+ - files and directories in and below direcory lib/core
+ - files and directories in and below direcory spec
+ - files and directories in and below direcory sample
+ - files in root directory
+ 
+This items are not covered by the LGPL:
+ - files and directories in and below direcory lib/plugins
+ - files and directories in and below direcory log
+ - files and directories in and below direcory testcases
+ - files and directories in and below direcory mybin
+ 
+= LGPL Content =
+
 GNU LESSER GENERAL PUBLIC LICENSE
                        Version 3, 29 June 2007
 
