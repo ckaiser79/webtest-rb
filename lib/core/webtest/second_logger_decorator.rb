@@ -42,22 +42,30 @@ module Webtest
 				@localLogger.debug(progname, &block)
 			end
 			
-			@decorated.debug(progname, &block) if @sendToBoth
+            if @sendToBoth
+                @decorated.debug(progname, &block)
+            end                
 		end	
 		
 		def info(progname = nil, &block)
 			if(@localLogger != nil)
 				@localLogger.info(progname, &block)			
 			end
-			
-			@decorated.info(progname, &block) if @sendToBoth
+		
+            if @sendToBoth
+                @decorated.info(progname, &block)
+            end
 		end		
 		
 		def warn(progname = nil, &block)
 			if(@localLogger != nil)
 				@localLogger.warn(progname, &block)
 			end
-			@decorated.warn(progname, &block) if @sendToBoth
+            
+           
+            if @sendToBoth
+                @decorated.warn(progname, &block)
+            end
 		end			
 	
 		def error(progname = nil, &block)

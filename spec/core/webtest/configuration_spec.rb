@@ -1,5 +1,7 @@
 
-require '../lib/webtest/configuration'
+$LOAD_PATH << '../../../lib/core'
+
+require 'webtest/configuration'
 
 module ConfigurationProvider 
 

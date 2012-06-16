@@ -33,17 +33,17 @@ module Webtest
 
 		def run
 		
-			puts "Started"
 			configureLogging
 
 			ac = WTAC.instance
 			ac.log.info("Started")
 
+            abortIfLogDirectoryNotClean
 			begin
-				abortIfLogDirectoryNotClean
 				executeAllSelectedTestcases
 			rescue Exception => e
 				ac.log.error("Abort TC Run: " + e.message)
+                ac.log.error e.backtrace
 			end
 
 			ac.log.info("Stopped")
@@ -75,9 +75,7 @@ module Webtest
 			stdoutLog = Logger.new(STDOUT)
 			stdoutLog.level = Logger::INFO
 			
-			# TODO buggy: stdout logger hides info from logfile
 			decoratedLog = SecondLoggerDecorator.newPassthroughLogger(log, stdoutLog)
-			decoratedLog = SecondLoggerDecorator.new(decoratedLog)
 			WTAC.instance.log = decoratedLog
 			
 		end
@@ -88,49 +86,58 @@ module Webtest
 			singleTestcase = ac.config.read("testrun:testcase")
 	
 			if(singleTestcase != "<empty>")
-				executeSingleTestcase(singleTestcase)				
+				executeSingleTestcase(singleTestcase, false)				
 			else
 				
 				locator = Webtest::TestcaseLocatorService.instance
 								
-				testcasesHome = '../' + ac.config.read("main:testcase-directory")
+                # TODO ugly hack
+				testcasesHome = '../../' + ac.config.read("main:testcase-directory")
+                                
 				testcasesIncludes = ac.config.read("testrun:includes")				
-				
+				ac.log.info "Load testcase in " + testcasesIncludes.to_s
+                
 				testcasesIncludes.each do |testcaseDirectory|
 				
 					testcases = locator.findTestcases testcasesHome + '/' + testcaseDirectory
 					
 					testcases.each do |testcase| 
-							executeSingleTestcase(testcase)
+						executeSingleTestcase(testcase, true)
 					end
 					
 				end
 			
 			end	
 			
-			#testcases = locator.find(ac.config.read("testrun:include"))
-			#for tc in testcases do
-			#	ac.log.info("run test " + tc)
-			#end
 		end
 		
-		def executeSingleTestcase(singleTestcase)
+		def executeSingleTestcase(singleTestcase, useTestcaseDirectoryPrefix)
 			
 			ac = WTAC.instance
-						
-			testcasesHome = '../' + ac.config.read("main:testcase-directory")
-			logDir = '../' + ac.config.read("main:logdir")
-			
-			singleTestcase = singleTestcase.gsub(/^#{testcasesHome}\/?/, "")
-			ac.log.debug "executeAllSelectedTestcases: singleTestcase = " + singleTestcase + ", testcasesHome=" + testcasesHome;
-			
-			engine = Webtest::RspecTestEngine.new
-			engine.testcaseDir = testcasesHome + "/" + singleTestcase
-			
+			logDir = '../../' + ac.config.read("main:logdir")		
+            
+            engine = Webtest::RspecTestEngine.new
+		
 			testrunner = Webtest::Testrunner.new
-			testrunner.testcaseDir = testcasesHome + "/" + singleTestcase
 			testrunner.testEngine = engine
 			testrunner.logDir = logDir + "/" + singleTestcase
+			
+            if useTestcaseDirectoryPrefix
+                testcasesHome = '../../' + ac.config.read("main:testcase-directory")
+                ac.log.debug "Using TC Home " + testcaseHome
+                singleTestcase = singleTestcase.gsub(/^#{testcasesHome}\/?/, "")
+            
+                engine.testcaseDir = testcasesHome + "/" + singleTestcase
+                testrunner.testcaseDir = testcasesHome + "/" + singleTestcase
+			
+            else
+                engine.testcaseDir = singleTestcase
+                testrunner.testcaseDir = singleTestcase
+            end
+			
+            ac.log.info "Log into directory " + logDir.to_s
+            ac.log.info "Execute testcase " + singleTestcase
+            
 			
 			ac.log.debug("executeSingleTestcase: testrunner.logDir=" + testrunner.logDir);
 			
@@ -148,9 +155,8 @@ module Webtest
 			logdir = '../' + @config.read("main:logdir")
 			Dir.foreach(logdir) do |entry|
 				WTAC.instance.log.debug "abortIfLogDirectoryNotClean: directory scan, entry='" + entry + "'"
-				raise "Log directory is not clean" unless entry == RUN_LOGFILE or entry == '.' or entry == '..'
+                raise "Log directory is not clean" unless entry == RUN_LOGFILE or entry == '.' or entry == '..'
 			end
-			
 		end
 	end
 end

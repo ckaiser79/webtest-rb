@@ -1,6 +1,9 @@
 *~
 conf/webtest.yml
 log
-archived
 spec/vendor
 lib/vendor
+bin/chromedriver.log
+spec/chromedriver.log
+bin-vendor
+spec/out.log

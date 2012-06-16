@@ -1,5 +1,7 @@
 
-require '../../lib/webtest'
+$LOAD_PATH << '../../../lib/core'
+
+require 'webtest'
 
 describe Webtest::BrowserLoggingDecorator, "#newBrowser" do
 

@@ -1,12 +1,11 @@
 #!/usr/bin/env ruby
 
 $LOAD_PATH << '../lib/core'
-$LOAD_PATH << '../lib/plugins'
+$LOAD_PATH << '../lib/vendor'
 
 require 'optparse'
 require 'webtest'
 require 'webtest/startup'
-
 
 def readCommandlineArguments
 

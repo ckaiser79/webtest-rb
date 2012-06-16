@@ -1,6 +1,8 @@
 
+$LOAD_PATH << '../../lib/core'
+
 require 'fileutils'
-require '../lib/wtac'
+require 'wtac'
 
 describe WTAC do
 
@@ -15,20 +17,14 @@ describe WTAC do
 
 	end
 	
-	it "can exchange log instance" do
+	it "logger exists" do
 		ac = WTAC.instance
 		
 		loggerToStdout = Logger.new(STDOUT)		
 		ac.log = loggerToStdout
 		
-		loggerToFile = Logger.new(File.open('out.log', File::WRONLY | File::CREAT))
-		
-		WTAC.addLocalLogger(loggerToFile)
-		WTAC.log.info("to file")
-		
-		WTAC.removeLocalLogger()		
-		WTAC.log.info("to stdout")
-		
+        ac.log.should_not be_nil 
+        
 	end
 
 end

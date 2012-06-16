@@ -1,16 +1,16 @@
 @echo off
 
-rm -rf ../archived
-mkdir ..\archived
+rm -rf ../log/archived
+mkdir ..\log\archived
 
 ruby run_testcases --verbose -b ie
-mv ../log ../archived/log.ie
+mv ../log/last_run ../log/archived/log.ie
 
 ruby run_testcases --verbose -b firefox
-mv ../log ../archived/log.firefox
+mv ../log/last_run ../log/archived/log.firefox
 
 ruby run_testcases --verbose -b chrome
-mv ../log ../archived/log.chrome
+mv ../log/last_run ../log/archived/log.chrome
 
 :end
 

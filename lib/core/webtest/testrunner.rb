@@ -5,6 +5,7 @@ require 'fileutils'
 
 require 'rspec'
 require 'rspec/core/runner'
+require 'wtac'
 
 module Webtest
 
@@ -21,8 +22,12 @@ module Webtest
 			args = [
 				"--format",
 				"nested",
+                "-I", "../lib/core",
+                "-I", "../lib/vendor",
 				testcaseSpec
 			]
+            
+            WTAC.instance.log.debug "run rspec " + args.to_s
 			return RSpec::Core::Runner.run(args, out, err)
 		
 		end

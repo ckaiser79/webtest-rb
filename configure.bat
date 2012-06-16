@@ -1,6 +1,6 @@
 
 md log
-md archived
+md log\archived
 
 mkdir lib\vendor
 mkdir spec\vendor

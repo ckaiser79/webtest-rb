@@ -2,7 +2,7 @@
 ---
 main:
   verbose: false
-  logdir: log
+  logdir: log/last_run
   testcase-directory: testcases
   
 browser-tests:
