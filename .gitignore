@@ -2,3 +2,5 @@
 conf/webtest.yml
 log
 archived
+spec/vendor
+lib/vendor
