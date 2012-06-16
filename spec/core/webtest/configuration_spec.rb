@@ -37,6 +37,11 @@ data:
   FINLAND:
     admin-user: admin-u1
     admin-pass: admin-p1
+    
+value:
+   refer_other1: Hello ${other} # relative is not implemented
+   refer_other2: Hello ${:value:other}
+   other: refered value
 ")
 
 		return cfg
@@ -82,6 +87,13 @@ describe Webtest::Configuration, " read operations" do
 		value.should eql "nested_value"
 	end
 
+    
+    it "reads a value with another value refered variant 1" do    
+       cfg = buildSampleConfiguration
+	   value = cfg.read("value:refer_other2")
+       value.should eql "Hello refered value" 
+    end
+    
 	it "reads existing arrays from global configuration" do
 		cfg = buildSampleConfiguration
 		value = cfg.read("an_array")

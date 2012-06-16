@@ -56,7 +56,7 @@ module Webtest
 		def configureLogging
 			
 			# TODO quick hack
-			logdir = '../' + @config.read("main:logdir")
+			logdir = @config.read("main:logdir")
 
 			FileUtils.rm_rf logdir
 			FileUtils.mkdir_p logdir
@@ -91,8 +91,7 @@ module Webtest
 				
 				locator = Webtest::TestcaseLocatorService.instance
 								
-                # TODO ugly hack
-				testcasesHome = '../../' + ac.config.read("main:testcase-directory")
+				testcasesHome = ac.config.read("main:testcase-directory")
                                 
 				testcasesIncludes = ac.config.read("testrun:includes")				
 				ac.log.info "Load testcase in " + testcasesIncludes.to_s
@@ -114,7 +113,7 @@ module Webtest
 		def executeSingleTestcase(singleTestcase, useTestcaseDirectoryPrefix)
 			
 			ac = WTAC.instance
-			logDir = '../../' + ac.config.read("main:logdir")		
+			logDir = ac.config.read("main:logdir")		
             
             engine = Webtest::RspecTestEngine.new
 		
@@ -123,7 +122,7 @@ module Webtest
 			testrunner.logDir = logDir + "/" + singleTestcase
 			
             if useTestcaseDirectoryPrefix
-                testcasesHome = '../../' + ac.config.read("main:testcase-directory")
+                testcasesHome = ac.config.read("main:testcase-directory")
                 ac.log.debug "Using TC Home " + testcaseHome
                 singleTestcase = singleTestcase.gsub(/^#{testcasesHome}\/?/, "")
             
@@ -152,7 +151,7 @@ module Webtest
 
 		def abortIfLogDirectoryNotClean
 		
-			logdir = '../' + @config.read("main:logdir")
+			logdir = @config.read("main:logdir")
 			Dir.foreach(logdir) do |entry|
 				WTAC.instance.log.debug "abortIfLogDirectoryNotClean: directory scan, entry='" + entry + "'"
                 raise "Log directory is not clean" unless entry == RUN_LOGFILE or entry == '.' or entry == '..'

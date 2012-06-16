@@ -1,9 +1,10 @@
 
 ---
 main:
+  apphome: ../../ # you need to modify this
   verbose: false
-  logdir: log/last_run
-  testcase-directory: testcases
+  logdir: ${main:apphome}/log/last_run
+  testcase-directory: ${main:apphome}/testcases
   
 browser-tests:
   # set to false, if browser should not be closed after testcase automatically
