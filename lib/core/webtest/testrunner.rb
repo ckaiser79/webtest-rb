@@ -22,8 +22,8 @@ module Webtest
 			args = [
 				"--format",
 				"nested",
-                "-I", "../lib/core",
-                "-I", "../lib/vendor",
+                "-I", "../../lib/core",
+                "-I", "../../lib/vendor",
 				testcaseSpec
 			]
             
