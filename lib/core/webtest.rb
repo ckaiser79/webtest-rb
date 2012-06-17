@@ -4,6 +4,7 @@ require 'webtest/files'
 require 'webtest/startup'
 require 'webtest/second_logger_decorator'
 require 'webtest/testcase_context'
+require 'webtest/testcase_context_loader'
 require 'webtest/testrunner'
 
 

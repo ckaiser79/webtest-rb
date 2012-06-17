@@ -11,6 +11,7 @@ require 'webtest/configuration'
 require 'webtest/second_logger_decorator'
 require 'webtest/testrunner'
 require 'webtest/testcase_context'
+require 'webtest/testcase_context_loader'
 
 
 module Webtest
@@ -113,8 +114,8 @@ module Webtest
 		def executeTestcaseWithAllContexts(singleTestcase, useTestcaseDirectoryPrefix)
 			
 			ac = WTAC.instance
-            allAvailableContexts = getAllTestcaseContexts(singleTestcase, useTestcaseDirectoryPrefix)
-            
+            allAvailableContexts = getAllTestcaseContexts(singleTestcase)
+                                    
             if allAvailableContexts == nil
                 executeSingleTestcase(singleTestcase, useTestcaseDirectoryPrefix)
             else
@@ -149,8 +150,11 @@ module Webtest
             WTAC.instance.log.info "Result " +  testrunner.to_s
         end
         
-        def getAllTestcaseContexts(singleTestcase, useTestcaseDirectoryPrefix)
-            return nil
+        def getAllTestcaseContexts(singleTestcase)
+            advice = Webtest::TestcaseContextLoader.new
+            advice.testcaseHomeDirectory = testcaseHomeDirectory(singleTestcase)
+            # FIXME return all keys to available context
+            return advice.loadAvailableContexts()
         end
         
         def buildAndConfigureTestrunner(singleTestcase, useTestcaseDirectoryPrefix)
@@ -187,6 +191,15 @@ module Webtest
             end
             
             return testrunner
+        end
+        
+        def testcaseHomeDirectory(singleTestcase)
+            if Pathname.new(singleTestcase).absolute?
+                return singleTestcase
+            else
+                testcasesHome = ac.config.read("main:testcase-directory")
+                return testcasesHome + "/" + singleTestcase
+            end
         end
         
         def removeTestcaseLogger
