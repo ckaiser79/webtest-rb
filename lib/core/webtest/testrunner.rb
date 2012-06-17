@@ -22,8 +22,6 @@ module Webtest
 			args = [
 				"--format",
 				"nested",
-                "-I", "../../lib/core",
-                "-I", "../../lib/vendor",
 				testcaseSpec
 			]
             
@@ -50,13 +48,13 @@ module Webtest
 		def valid?			
 
 			# TODO may remove this later
-			WTAC.instance.log.debug "valid?: testcaseDir set? " + (@testcaseDir != nil).to_s
-			WTAC.instance.log.debug "valid?:  spec.rb exists? " + File.exists?(@testcaseDir + "/spec.rb").to_s
-			WTAC.instance.log.debug "valid?: spec.yml exists? " + File.exists?(@testcaseDir + "/spec.yml").to_s
+			log = WTAC.instance.log
+            log.debug "valid?: testcaseDir set? " + (@testcaseDir != nil).to_s
+			log.debug "valid?:  spec.rb exists? " + File.exists?(@testcaseDir + "/spec.rb").to_s
+			log.debug "valid?: spec.yml exists? " + File.exists?(@testcaseDir + "/spec.yml").to_s
 		
 			result = @testcaseDir != nil		
 			result = result && File.exists?(@testcaseDir + "/spec.rb") 		
-			#result = result && File.exists?(@testcaseDir + "/spec.yml")
 			
 			return result
 		end
@@ -139,9 +137,9 @@ module Webtest
 			if(!valid?)
 				raise "Invalid testcase specification. Does spec.yml and spec.rb exist?"
 			end
-			
+            
+			WTAC.instance.log.debug "logDir '" + @logDir + "'" 
 			FileUtils::mkdir_p(@logDir)
-			
 		end
 		
 		def configureLogging
@@ -161,11 +159,13 @@ module Webtest
 			stdoutLog = Logger.new(STDOUT)
 			stdoutLog.level = Logger::INFO
 			
+            # just keep newPassThrough logger
 			decoratedLog = SecondLoggerDecorator.newPassthroughLogger(log, stdoutLog)
-			
+            
 			ac = WTAC.instance
 			ac.log.localLogger = decoratedLog
-			
+			ac.log.sendToBoth = false
+            
 			SZ::NumericPrefixGenerateService.instance.directoryPrefix = @logDir
 		end
 	end

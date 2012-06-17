@@ -24,7 +24,6 @@ describe "Walk heise.de page" do
     source = @browser.html
     
     source.should include '<a class="channel_titel" title="heise online News" href="/">News</a>'
-	source.should include '<meta name="copyright" content="Heise Zeitschriften Verlag" />'
 	
   end
 
