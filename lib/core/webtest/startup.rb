@@ -40,13 +40,8 @@ module Webtest
 			ac.log.info("Started")
 
             abortIfLogDirectoryNotClean
-			begin
-				executeAllSelectedTestcases
-			rescue Exception => e
-				ac.log.error("Abort TC Run: " + e.message)
-                ac.log.error e.backtrace
-			end
-
+			executeAllSelectedTestcases
+			
 			ac.log.info("Stopped")
 			ac.close
 
@@ -121,7 +116,12 @@ module Webtest
 						
 			if(testrunner.valid?)
 				ac.log.info("Start execute test " + testrunner.to_s)
-				testrunner.run
+                begin
+                    testrunner.run
+                rescue Exception => e
+                    ac.log.error("Abort TC Run: " + e.message)
+                    ac.log.error e.backtrace
+                end
 				ac.log.info("Finished execute test " + testrunner.to_s)
 			else
 				ac.log.warn("Selected testcase '" + singleTestcase + "' is invalid (dir = '" + testcasesHome + "').")
