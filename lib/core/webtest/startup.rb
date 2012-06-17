@@ -10,6 +10,7 @@ require 'pathname'
 require 'webtest/configuration'
 require 'webtest/second_logger_decorator'
 require 'webtest/testrunner'
+require 'webtest/testcase_context'
 
 
 module Webtest
@@ -85,7 +86,7 @@ module Webtest
 			singleTestcase = ac.config.read("testrun:testcase")
 	
 			if(singleTestcase != "<empty>")
-				executeSingleTestcase(singleTestcase, false)				
+				executeTestcaseWithAllContexts(singleTestcase, false)				
 			else
 				
 				locator = Webtest::TestcaseLocatorService.instance
@@ -100,7 +101,7 @@ module Webtest
 					testcases = locator.findTestcases testcasesHome + '/' + testcaseDirectory
 					
 					testcases.each do |testcase| 
-						executeSingleTestcase(testcase, true)
+						executeTestcaseWithAllContexts(testcase, true)
 					end
 					
 				end
@@ -109,27 +110,48 @@ module Webtest
 			
 		end
 		
-		def executeSingleTestcase(singleTestcase, useTestcaseDirectoryPrefix)
+		def executeTestcaseWithAllContexts(singleTestcase, useTestcaseDirectoryPrefix)
 			
 			ac = WTAC.instance
-            testrunner = buildAndConfigureTestrunner(singleTestcase,useTestcaseDirectoryPrefix)
-						
-			if(testrunner.valid?)
-				ac.log.info("Start execute test " + testrunner.to_s)
+            allAvailableContexts = getAllTestcaseContexts(singleTestcase, useTestcaseDirectoryPrefix)
+            
+            if allAvailableContexts == nil
+                executeSingleTestcase(singleTestcase, useTestcaseDirectoryPrefix)
+            else
+                allAvailableContexts.each do |yamlContext| 
+                    Webtest::TestcaseContext.instance.reset
+                    executeSingleTestcase(singleTestcase, useTestcaseDirectoryPrefix)
+                end
+            end
+            
+		end
+        
+        def executeSingleTestcase(singleTestcase, useTestcaseDirectoryPrefix)
+        
+            testrunner = buildAndConfigureTestrunner(singleTestcase, useTestcaseDirectoryPrefix)
+            ac = WTAC.instance
+               
+            if(testrunner.valid?)
+                ac.log.info("Start execute test " + testrunner.to_s)
                 begin
                     testrunner.run
                 rescue Exception => e
                     ac.log.error("Abort TC Run: " + e.message)
                     ac.log.error e.backtrace
                 end
-				ac.log.info("Finished execute test " + testrunner.to_s)
-			else
-				ac.log.warn("Selected testcase '" + singleTestcase + "' is invalid (dir = '" + testcasesHome + "').")
-			end
+                ac.log.info("Finished execute test " + testrunner.to_s)
+            else
+                ac.log.warn("Selected testcase '" + singleTestcase + "' is invalid (dir = '" + testcasesHome + "').")
+            end
+
         ensure
             removeTestcaseLogger
-            WTAC.instance.log.info "Result " +  testrunner.to_s       
-		end
+            WTAC.instance.log.info "Result " +  testrunner.to_s
+        end
+        
+        def getAllTestcaseContexts(singleTestcase, useTestcaseDirectoryPrefix)
+            return nil
+        end
         
         def buildAndConfigureTestrunner(singleTestcase, useTestcaseDirectoryPrefix)
         	ac = WTAC.instance
@@ -137,13 +159,15 @@ module Webtest
             
             engine = Webtest::RspecTestEngine.new
 		
-			testrunner = Webtest::Testrunner.new
+			testrunner = Webtest::ContextAwareTestrunner.new
 			testrunner.testEngine = engine
+            
+            
                         
             if Pathname.new(singleTestcase).absolute?
                 testcaseLogDir = logDir + "/" + guessTestcaseDirectoryByAbsolutePath(singleTestcase)
             else
-                # should work in mos cases. I expect to work with absolute directories
+                # should work in most cases. I expect to work with absolute directories
                 testcaseLogDir = logDir + "/" + singleTestcase
             end
             

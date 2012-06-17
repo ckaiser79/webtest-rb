@@ -1,6 +1,5 @@
 
 require 'singleton'
-require 'webtest'
 
 class WTAC
 

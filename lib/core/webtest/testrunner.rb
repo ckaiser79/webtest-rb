@@ -60,7 +60,23 @@ module Webtest
 		end
 		
 		def run
-
+            doRun
+        end
+		
+		def testcaseName
+			return "<unknown-testcase>" if @testcaseDir == nil
+			/\/?([^\/]+)\/?$/.match(@testcaseDir)
+			return $1
+		end
+	
+		def to_s
+			return testcaseName() + " [" + @executionResult + "]"
+		end
+	
+		protected
+		
+        def doRun
+        
 			assertValidDirectoriesAndCreateThem
 			assertValidConfiguration
 			configureLogging
@@ -79,6 +95,7 @@ module Webtest
 			
 			@testEngine.testcaseDir = @testcaseDir
 			rc = RC_TESTENGINE_THROWS_EXCEPTION
+            
 			begin
 				rc = @testEngine.runTest(out,err)
 			rescue Exception => e
@@ -104,19 +121,9 @@ module Webtest
 			ac.log.localLogger = nil
 
 		end
-		
-		def testcaseName
-			return "<unknown-testcase>" if @testcaseDir == nil
-			/\/?([^\/]+)\/?$/.match(@testcaseDir)
-			return $1
-		end
-	
-		def to_s
-			return testcaseName + " [" + @executionResult + "]"
-		end
-	
-		private
-		
+        
+        private
+        
 		def logTestcaseResult(rc)
 			ac = WTAC.instance
 			testcaseName = testcaseName()
@@ -159,7 +166,6 @@ module Webtest
 			stdoutLog = Logger.new(STDOUT)
 			stdoutLog.level = Logger::INFO
 			
-            # just keep newPassThrough logger
 			decoratedLog = SecondLoggerDecorator.newPassthroughLogger(log, stdoutLog)
             
 			ac = WTAC.instance
@@ -169,4 +175,28 @@ module Webtest
 			SZ::NumericPrefixGenerateService.instance.directoryPrefix = @logDir
 		end
 	end
+    
+    class ContextAwareTestrunner < Testrunner
+            
+        def run
+            if isContextAvailable
+                @logDir = @logDir + "/" + Webtest::TestcaseContext.instance.name 
+            end
+            
+            super.run
+        end
+        
+		def to_s
+            if isContextAvailable
+                name = " @ " + Webtest::TestcaseContext.instance.name
+            else
+                name = ""
+            end
+			return testcaseName() + name + " [" + @executionResult + "]"
+		end
+        
+        def isContextAvailable
+            return Webtest::TestcaseContext.instance.name != Webtest::TestcaseContext::DEFAULT_CONTEXT_NAME
+        end
+    end
 end

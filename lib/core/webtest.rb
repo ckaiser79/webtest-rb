@@ -3,7 +3,9 @@ require 'webtest/configuration'
 require 'webtest/files'
 require 'webtest/startup'
 require 'webtest/second_logger_decorator'
+require 'webtest/testcase_context'
 require 'webtest/testrunner'
+
 
 #order is important here
 require 'webtest/browser_logging_decorator'
