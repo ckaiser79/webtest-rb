@@ -119,8 +119,12 @@ module Webtest
             if allAvailableContexts == nil
                 executeSingleTestcase(singleTestcase, useTestcaseDirectoryPrefix)
             else
-                allAvailableContexts.each do |yamlContext| 
+                allAvailableContexts.each do |key,value| 
+                    
                     Webtest::TestcaseContext.instance.reset
+                    Webtest::TestcaseContext.instance.name = key
+                    Webtest::TestcaseContext.instance.contextConfiguration = value
+                    
                     executeSingleTestcase(singleTestcase, useTestcaseDirectoryPrefix)
                 end
             end
@@ -151,10 +155,9 @@ module Webtest
         end
         
         def getAllTestcaseContexts(singleTestcase)
-            advice = Webtest::TestcaseContextLoader.new
-            advice.testcaseHomeDirectory = testcaseHomeDirectory(singleTestcase)
-            # FIXME return all keys to available context
-            return advice.loadAvailableContexts()
+            loader = Webtest::TestcaseContextLoader.new
+            loader.testcaseHomeDirectory = testcaseHomeDirectory(singleTestcase)
+            return loader.loadAvailableContexts()
         end
         
         def buildAndConfigureTestrunner(singleTestcase, useTestcaseDirectoryPrefix)
@@ -197,7 +200,7 @@ module Webtest
             if Pathname.new(singleTestcase).absolute?
                 return singleTestcase
             else
-                testcasesHome = ac.config.read("main:testcase-directory")
+                testcasesHome = WTAC.instance.config.read("main:testcase-directory")
                 return testcasesHome + "/" + singleTestcase
             end
         end

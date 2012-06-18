@@ -10,7 +10,7 @@ module Webtest
         DEFAULT_CONTEXT_NAME = "unknown-context"
         
         attr_accessor :name
-        attr_writer :contextYaml
+        attr_writer :contextConfiguration
         
         def initialize
             reset
@@ -18,7 +18,15 @@ module Webtest
         
         def reset
             @name = DEFAULT_CONTEXT_NAME
-            @contextYaml = nil
+            @contextConfiguration = nil
+        end
+        
+        def to_s
+            return @name + ": " + @contextConfiguration.to_s
+        end
+        
+        def key(path)
+            
         end
     
     end

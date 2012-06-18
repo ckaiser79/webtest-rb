@@ -2,7 +2,13 @@
 
 test-contexts:
   one:
-    value1: xyz
-    value2: abc
+    value1: one-xyz
+    value2: one-abc
     nested1:
       nested-value1: 123
+  two:
+    value1: two-xyz
+    value2: two-abc
+    nested1:
+      nested-value1: 456
+  

@@ -1,9 +1,10 @@
 
+require 'webtest/testcase_context'
+
 describe "Run something" do
 
     before :all do
-        #@context = TestContext.instance
-        @context = nil
+        @context = Webtest::TestcaseContext.instance
     end
 
   it "pass something" do

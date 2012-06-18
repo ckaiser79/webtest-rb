@@ -8,15 +8,19 @@ module Webtest
         
         def loadAvailableContexts
             
-            specYmlFileExists = File.exists?(@testcaseHomeDirectory + "/spec.yml") 	
+            log = WTAC.instance.log
+            
+            fileName = @testcaseHomeDirectory.to_s + "/spec.yml"
+            specYmlFileExists = File.exists?(fileName) 	
             ymlTestcaseContext = nil
             
+            log.debug "Check file existance: " + specYmlFileExists.to_s + " for " + fileName
             if specYmlFileExists
-                ymlTestcase = YAML.load(@testcaseHomeDirectory + "/spec.yml")
+                ymlTestcase = YAML.load(File.open(fileName))
                 ymlTestcaseContext = ymlTestcase['test-contexts']
             end
             
-            WTAC.instance.log.info "ymlTestcaseContext = " + ymlTestcaseContext.to_s
+            log.debug "ymlTestcaseContext = " + ymlTestcaseContext.to_s
             return ymlTestcaseContext
         end
         
