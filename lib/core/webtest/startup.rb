@@ -115,7 +115,8 @@ module Webtest
 			
 			ac = WTAC.instance
             allAvailableContexts = getAllTestcaseContexts(singleTestcase)
-                                    
+                           
+			ac.log.info "allAvailableContexts = " + allAvailableContexts.to_s
             if allAvailableContexts == nil
                 executeSingleTestcase(singleTestcase, useTestcaseDirectoryPrefix)
             else
@@ -197,6 +198,9 @@ module Webtest
         end
         
         def testcaseHomeDirectory(singleTestcase)
+			
+			WTAC.instance.log.info "singleTestcase = " + singleTestcase
+		
             if Pathname.new(singleTestcase).absolute?
                 return singleTestcase
             else

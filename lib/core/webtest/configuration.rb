@@ -111,6 +111,10 @@ module Webtest
 			lastHash[lastKey] = value
 		end
 		
+        def setGlobal(hash)
+            @globalConfig = hash
+        end
+        
 		def loadGlobal(yamlString)
 			if(yamlString == nil) 
 				@globalConfig = nil

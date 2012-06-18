@@ -25,8 +25,11 @@ module Webtest
             return @name + ": " + @contextConfiguration.to_s
         end
         
-        def key(path)
-            
+        def read(path)
+            return nil if @contextConfiguration == nil
+            cfg = Webtest::Configuration.new
+            cfg.setGlobal(@contextConfiguration)
+            return cfg.read(path)
         end
     
     end
