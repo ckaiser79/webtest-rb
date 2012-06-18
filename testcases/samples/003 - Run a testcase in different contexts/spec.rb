@@ -7,8 +7,10 @@ describe "Run something" do
         @context = Webtest::TestcaseContext.instance
     end
 
-  it "pass something" do
+  it "display current context" do
     WTAC.instance.log.debug "Context: " + @context.to_s
+    WTAC.instance.log.debug "Context: " + @context.read('value2').to_s
+    WTAC.instance.log.debug "Context: " + @context.read('nested1:nested-value1').to_s
   end
 
 end
