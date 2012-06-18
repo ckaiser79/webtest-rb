@@ -14,5 +14,7 @@ set TC=%TC:  ##=##%
 set TC=%TC: ##=##%
 set TC=%TC:##=%
 
-ruby run_testcases --verbose -t "../testcases/%TCGROUP%/%TC%"
+::set WT_OTPS=--verbose 
+set WT_OPTS=
 
+ruby run_testcases %WT_OPTS% -t "../testcases/%TCGROUP%/%TC%"

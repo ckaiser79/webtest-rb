@@ -1,8 +1,8 @@
 
 ---
 main:
-  apphome: ../../ # you need to modify this
   verbose: false
+  apphome: ../../ # you need to modify this
   logdir: ${main:apphome}/log/last_run
   testcase-directory: ${main:apphome}/testcases
   

@@ -8,7 +8,7 @@ describe "Run something" do
     end
 
   it "pass something" do
-    WTAC.instance.log.info "Context: " + @context.to_s
+    WTAC.instance.log.debug "Context: " + @context.to_s
   end
 
 end

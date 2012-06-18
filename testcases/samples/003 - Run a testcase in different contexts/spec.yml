@@ -1,5 +1,8 @@
 ---
 
+main:
+  verbose: true
+  
 test-contexts:
   one:
     value1: one-xyz

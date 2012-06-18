@@ -79,7 +79,6 @@ module Webtest
         
 			assertValidDirectoriesAndCreateThem
 			assertValidConfiguration
-			configureLogging
 			
 			ac = WTAC.instance
 			if File.exists?(@testcaseDir + "/spec.yml")
@@ -87,8 +86,8 @@ module Webtest
 			else
 				ac.config.loadLocal(nil)
 			end
-			
-			ac.log.info("Start '" + testcaseName() + "'")
+            
+            configureLogging
 			
 			out = Webtest::Files::openWriteCreate(@logDir + "/rspec-stdout.txt")
 			err = Webtest::Files::openWriteCreate(@logDir + "/rspec-stderr.txt")
@@ -112,7 +111,7 @@ module Webtest
 			BrowserFactory.closeAllBrowsers()
 			Webtest::Files.closeAll()		
 			
-			logTestcaseResult(rc)
+			setTestcaseResult(rc)
 					
 			Webtest::Files.close(out)
 			Webtest::Files.close(err)
@@ -124,14 +123,10 @@ module Webtest
         
         private
         
-		def logTestcaseResult(rc)
-			ac = WTAC.instance
-			testcaseName = testcaseName()
+		def setTestcaseResult(rc)
 			if(rc != 0)
-				ac.log.error("Result: ==FAIL== '" + testcaseName + "', rc = " + rc.to_s)
 				@executionResult = "FAIL"
 			else
-				ac.log.info("Result: ==SUCCESS== '" + testcaseName + "', rc = " + rc.to_s)
 				@executionResult = "SUCCESS"
 			end
 		end
@@ -154,19 +149,17 @@ module Webtest
 			ac = WTAC.instance
 			logfile = File.open(@logDir + '/run.log', File::WRONLY | File::CREAT)
 			log = Logger.new(logfile)
-			
-			if(isTrue(ac.config.read("main:verbose")))
-				log.level = Logger::DEBUG
-				log.debug("Running in debug mode")
-			else
-				log.level = Logger::INFO
-				log.debug("Running in info mode")
-			end
-		
+					
 			stdoutLog = Logger.new(STDOUT)
 			stdoutLog.level = Logger::INFO
 			
 			decoratedLog = SecondLoggerDecorator.newPassthroughLogger(log, stdoutLog)
+            
+			if(isTrue(ac.config.read("main:verbose")))
+				decoratedLog.level = Logger::DEBUG
+			else
+				decoratedLog.level = Logger::INFO
+			end
             
 			ac = WTAC.instance
 			ac.log.localLogger = decoratedLog
