@@ -17,7 +17,9 @@ module Webtest
             log.debug "Check file existance: " + specYmlFileExists.to_s + " for " + fileName
             if specYmlFileExists
                 ymlTestcase = YAML.load(File.open(fileName))
-                ymlTestcaseContext = ymlTestcase['test-contexts']
+				if ymlTestcase != nil && ymlTestcase != false
+					ymlTestcaseContext = ymlTestcase['test-contexts']
+				end
             end
             
             log.debug "ymlTestcaseContext = " + ymlTestcaseContext.to_s
