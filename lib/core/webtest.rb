@@ -1,4 +1,5 @@
 
+require 'webtest/include_locator'
 require 'webtest/configuration'
 require 'webtest/files'
 require 'webtest/startup'

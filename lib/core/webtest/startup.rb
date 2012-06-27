@@ -24,10 +24,10 @@ module Webtest
 		
 		attr_reader :config
 
-		def init(yamlConfig)
+		def init(yamlString)
 
 			@config = Webtest::Configuration.new
-			@config.loadGlobal(yamlConfig)
+			@config.loadGlobal(yamlString)
 
 			ac = WTAC.instance
 			ac.config = @config
@@ -232,6 +232,8 @@ module Webtest
 		def abortIfLogDirectoryNotClean
 		
 			logdir = @config.read("main:logdir")
+			WTAC.instance.log.info "Scanning " + logdir
+			
 			Dir.foreach(logdir) do |entry|
 				WTAC.instance.log.debug "abortIfLogDirectoryNotClean: directory scan, entry='" + entry + "'"
                 raise "Log directory is not clean" unless entry == RUN_LOGFILE or entry == '.' or entry == '..'

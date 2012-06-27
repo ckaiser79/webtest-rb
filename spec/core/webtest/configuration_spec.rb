@@ -5,6 +5,17 @@ require 'webtest/configuration'
 
 module ConfigurationProvider 
 
+    def buildSampleConfigurationWithIncludeStatement
+        cfg = Webtest::Configuration.new
+        cfg.loadGlobal("
+---
+foo: bar
+another-file: xyz
+another-file: $(include:sample-for-inclusion.yml)
+")
+        return cfg
+    end
+
 	def buildSampleConfiguration 
 		cfg = Webtest::Configuration.new
 
@@ -97,6 +108,16 @@ describe Webtest::Configuration, " read operations" do
 	it "reads existing arrays from global configuration" do
 		cfg = buildSampleConfiguration
 		value = cfg.read("an_array")
+		value[0].should eql "one"
+		value[1].should eql "two"
+		value[2].should eql "three"
+	end
+    
+    it "can include another yaml config file" do
+		cfg = buildSampleConfigurationWithIncludeStatement
+        cfg.read("another-file:key-one").should eql "val one"
+        
+        value = cfg.read("another-file:key-array")
 		value[0].should eql "one"
 		value[1].should eql "two"
 		value[2].should eql "three"
