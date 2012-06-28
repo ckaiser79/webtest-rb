@@ -1,0 +1,7 @@
+
+---
+key-one: val one
+key-array: 
+  - one
+  - two
+  - three

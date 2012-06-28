@@ -142,12 +142,11 @@ module Webtest
 			end
 
             includeLocator = Webtest::IncludeLocator.new
-			parent=configuration
-            child = parent
+			parent = configuration
             
 			for item in path.split(":") do
 				child=parent[item]
-                
+				
                 if includeLocator.includeFile?(child)
                     
                     # remove include statement
@@ -161,6 +160,7 @@ module Webtest
                     
                     parent[item] = ymlObject
                     child = parent[item]
+					
                 end
                 
                 
