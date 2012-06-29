@@ -101,7 +101,9 @@ module Webtest
 				ac.log.warn("Testengine throws exception: " + e.message)	
 				ac.log.warn(e.backtrace)
 				
-				@executionResult = "FAIL BY EXCEPTION (" + e.message + ")"				
+				@executionResult = "FAIL BY EXCEPTION (" + e.message + ")"
+			ensure
+				 Webtest::TestcaseContext.instance.reset()
 			end
 			
 			#

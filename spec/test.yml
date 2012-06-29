@@ -6,3 +6,6 @@ colors:
   - red
   - blue
 
+i18n-1: $(include:i18n.yml)
+i18n-2: $(include:${main:app_home}/conf/i18n.yml)
+

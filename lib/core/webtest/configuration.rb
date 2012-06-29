@@ -1,5 +1,6 @@
 
 require 'yaml'
+require 'webtest/include_locator'
 
 module Webtest
     
@@ -118,7 +119,7 @@ module Webtest
 		def loadGlobal(yamlString)
 			if(yamlString == nil) 
 				@globalConfig = nil
-			else
+			else                
 				@globalConfig = YAML.load(yamlString)
 			end		
 			
@@ -140,16 +141,37 @@ module Webtest
 				return nil
 			end
 
-			result=configuration
-
+            includeLocator = Webtest::IncludeLocator.new
+			parent = configuration
+            
 			for item in path.split(":") do
-				result=result[item]
-				if(result == nil)
+				child=parent[item]
+				
+                if includeLocator.includeFile?(child)
+                    
+                    # remove include statement
+                    parent[item] = nil
+                    
+                    # add new subtree to global configuration
+                    fileName = includeLocator.includedFileName(child)
+                    
+                    ymlString = File.open(fileName)
+                    ymlObject = YAML.load(ymlString)
+                    
+                    parent[item] = ymlObject
+                    child = parent[item]
+					
+                end
+                
+                
+				if(child == nil)
 					return nil
+                else
+                    parent = child
 				end
 			end
 
-			return result
+			return parent
 		end
 
 	end

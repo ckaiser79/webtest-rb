@@ -1,1 +1,1 @@
-grep -n ERROR ../archived/*/run.log
+grep -n "\[FAIL\]" ../log/last_run/run.log
