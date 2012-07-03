@@ -11,18 +11,21 @@ module Webtest
 
 	class RspecTestEngine
 		
-		attr_writer :testcaseDir
+		attr_writer :testcaseSpec
+		
+		def initialize
+			@fileName = "/spec.rb"
+		end
 		
 		def runTest(out, err)
 		
 			RSpec::configuration.error_stream = nil
 			RSpec::configuration.output_stream = nil
-			testcaseSpec = @testcaseDir + "/spec.rb"
 			
 			args = [
 				"--format",
 				"nested",
-				testcaseSpec
+				@testcaseSpec
 			]
             
             WTAC.instance.log.debug "run rspec " + args.to_s
@@ -41,8 +44,11 @@ module Webtest
 		attr_accessor :testcaseDir
 		attr_writer :testEngine
 		
+		attr_reader :detectedBugs
+		
 		def initialize
 			@executionResult = "NOT EXECUTED"
+			@detectedBugs = Array.new
 		end
 		
 		def valid?			
@@ -92,37 +98,68 @@ module Webtest
 			out = Webtest::Files::openWriteCreate(@logDir + "/rspec-stdout.txt")
 			err = Webtest::Files::openWriteCreate(@logDir + "/rspec-stderr.txt")
 			
-			@testEngine.testcaseDir = @testcaseDir
+			@testEngine.testcaseSpec = @testcaseDir + '/spec.rb'
 			rc = RC_TESTENGINE_THROWS_EXCEPTION
             
-			begin
-				rc = @testEngine.runTest(out,err)
-			rescue Exception => e
-				ac.log.warn("Testengine throws exception: " + e.message)	
-				ac.log.warn(e.backtrace)
-				
-				@executionResult = "FAIL BY EXCEPTION (" + e.message + ")"
-			ensure
-				 Webtest::TestcaseContext.instance.reset()
-			end
+			executeTestEngine()
 			
 			#
 			# cleanup TODO put into own object
 			#
-			
+						
+			WTAC.instance.log.debug("rc = " + rc.to_s)
+			if rc != 0
+				# scan for known bugs and rerun each bug
+				Dir[@testcaseDir + '/spec*.rb'].each do |file|
+					
+					# find bug name
+					file =~ /^.+\/spec[-_\s]+(.+)\.rb$/
+					bugName = $1
+					
+					if bugName != nil
+						WTAC.instance.log.info("Check for bug " + bugName)
+						@testEngine.testcaseSpec = file
+						rc = executeTestEngine(bugName)
+						if(rc == 0)
+							@detectedBugs.push bugName
+						end
+					end
+					
+				end
+			end
+						
 			BrowserFactory.closeAllBrowsers()
-			Webtest::Files.closeAll()		
-			
-			setTestcaseResult(rc)
 					
 			Webtest::Files.close(out)
-			Webtest::Files.close(err)
-				
+			Webtest::Files.close(err)	
+			
+			Webtest::Files.closeAll()			
+
+
 			ac.config.loadLocal(nil)
 			ac.log.localLogger = nil
 
 		end
         
+		def executeTestEngine(suffix = nil)
+			ac = WTAC.instance
+			
+			out = Webtest::Files::openWriteCreate(@logDir + "/rspec-stdout" + suffix.to_s + ".txt")
+			err = Webtest::Files::openWriteCreate(@logDir + "/rspec-stderr" + suffix.to_s + ".txt")
+			
+			begin
+				rc = @testEngine.runTest(out,err)
+			rescue Exception => e
+				ac.log.warn("Testengine throws exception: " + e.message)	
+				ac.log.warn("Dump stacktrace:\n" + e.backtrace.join("\n"))
+				
+				@executionResult = "FAIL BY EXCEPTION (" + e.message + ")"
+			end
+			
+			setTestcaseResult(rc)
+			return rc
+		end
+		
         private
         
 		def setTestcaseResult(rc)
@@ -178,7 +215,9 @@ module Webtest
                 @logDir = @logDir + "/" + Webtest::TestcaseContext.instance.name 
             end
             
-            super.run
+            super
+		ensure
+			Webtest::TestcaseContext.instance.reset()
         end
         
 		def to_s
@@ -194,4 +233,15 @@ module Webtest
             return Webtest::TestcaseContext.instance.name != Webtest::TestcaseContext::DEFAULT_CONTEXT_NAME
         end
     end
+	
+	class SingleTestfileRunner
+	
+		attr_accessor :logDir
+		attr_accessor :testcaseDir
+		attr_writer :testEngine
+		
+		def run
+		
+		end
+	end
 end

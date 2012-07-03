@@ -152,7 +152,15 @@ module Webtest
 
         ensure
             removeTestcaseLogger
-            WTAC.instance.log.info "Result " +  testrunner.to_s
+            
+			if testrunner.detectedBugs.length > 0
+				WTAC.instance.log.warn "Result (with bugs detected): " +  testrunner.to_s 
+				testrunner.detectedBugs.each do |bugName|
+					WTAC.instance.log.warn "Detected bug: " + bugName
+				end
+			else
+				WTAC.instance.log.info "Result " +  testrunner.to_s
+			end
         end
         
         def getAllTestcaseContexts(singleTestcase)
@@ -186,11 +194,9 @@ module Webtest
                 ac.log.debug "Using TC Home " + testcasesHome
                 singleTestcase = singleTestcase.gsub(/^#{testcasesHome}\/?/, "")
             
-                engine.testcaseDir = testcasesHome + "/" + singleTestcase
                 testrunner.testcaseDir = testcasesHome + "/" + singleTestcase
 			
             else
-                engine.testcaseDir = singleTestcase
                 testrunner.testcaseDir = singleTestcase
             end
             
