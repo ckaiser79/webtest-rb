@@ -44,11 +44,8 @@ module Webtest
 		attr_accessor :testcaseDir
 		attr_writer :testEngine
 		
-		attr_reader :detectedBugs
-		
 		def initialize
 			@executionResult = "NOT EXECUTED"
-			@detectedBugs = Array.new
 		end
 		
 		def valid?			
@@ -109,22 +106,9 @@ module Webtest
 						
 			WTAC.instance.log.debug("rc = " + rc.to_s)
 			if rc != 0
-				# scan for known bugs and rerun each bug
+				# scan for known issues and rerun each issue
 				Dir[@testcaseDir + '/spec*.rb'].each do |file|
-					
-					# find bug name
-					file =~ /^.+\/spec[-_\s]+(.+)\.rb$/
-					bugName = $1
-					
-					if bugName != nil
-						WTAC.instance.log.info("Check for bug " + bugName)
-						@testEngine.testcaseSpec = file
-						rc = executeTestEngine(bugName)
-						if(rc == 0)
-							@detectedBugs.push bugName
-						end
-					end
-					
+					executeIssueFileSpec(file)
 				end
 			end
 						
@@ -135,12 +119,30 @@ module Webtest
 			
 			Webtest::Files.closeAll()			
 
-
 			ac.config.loadLocal(nil)
 			ac.log.localLogger = nil
 
 		end
         
+		def executeIssueFileSpec(file)
+			# find issue name
+			file =~ /^.+\/spec[-_\s]+(.+)\.rb$/
+			issueName = $1
+			
+			if issueName != nil
+				
+				issue = IssueDefinitionContext.instance.create(issueName)
+				WTAC.instance.log.info("Check for issue " + issue.to_s)
+				
+				@testEngine.testcaseSpec = file
+				
+				rc = executeTestEngine(bugName)
+				issue.markDetected if(rc == 0)
+			
+			end
+			
+		end
+		
 		def executeTestEngine(suffix = nil)
 			ac = WTAC.instance
 			

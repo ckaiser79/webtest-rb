@@ -12,6 +12,7 @@ require 'webtest/second_logger_decorator'
 require 'webtest/testrunner'
 require 'webtest/testcase_context'
 require 'webtest/testcase_context_loader'
+require 'sz'
 
 
 module Webtest
@@ -152,16 +153,22 @@ module Webtest
 
         ensure
             removeTestcaseLogger
-            
-			if testrunner.detectedBugs.length > 0
-				WTAC.instance.log.warn "Result (with bugs detected): " +  testrunner.to_s 
-				testrunner.detectedBugs.each do |bugName|
-					WTAC.instance.log.warn "Detected bug: " + bugName
+			logExecutionResult(testrunner)
+        end
+		
+		def logExecutionResult(testrunner)
+			idc = SZ::IssueDefinitionContext.instance
+			if idc.issues.length > 0
+				WTAC.instance.log.warn "Result (with issues detected): " +  testrunner.to_s 
+				idc.issues.each do |issue|
+					WTAC.instance.log.warn "Detected issue: " + issue.to_s if issue.detected?
 				end
 			else
 				WTAC.instance.log.info "Result " +  testrunner.to_s
 			end
-        end
+			
+			idc.reset		
+		end
         
         def getAllTestcaseContexts(singleTestcase)
             loader = Webtest::TestcaseContextLoader.new
