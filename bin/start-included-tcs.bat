@@ -1,4 +1,6 @@
 @echo off
 
-::ruby run_testcases %*
-ruby run_testcases --verbose 
+::set WT_OTPS=--verbose 
+set WT_OPTS=
+
+ruby wetest-rb %WT_OPTS%

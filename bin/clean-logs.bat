@@ -1,2 +1,3 @@
-@echo off
-rm -rf ../log
+pushd ..
+rake rm_logs
+popd
