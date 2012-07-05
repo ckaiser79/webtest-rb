@@ -6,15 +6,17 @@ NAME='webtest-rb'
 VERSION='0.0-SNAPSHOT'
 
 task :default => :help
+task :package => [ :lgpl_prepare, :install ]
 
 task :help do
-	puts "rake <rm_logs|rm_vendor|install>"
+	puts "rake <rm_logs|rm_vendor_files|install|package>"
 end
 
 task :lgpl_prepare => [ :rm_vendor_files, :rm_logs ]
 
 task :rm_logs do
 	FileUtils.rm_rf('log')
+	FileUtils.rm_rf('pckg')
 end
 
 task :rm_vendor_files do
@@ -34,10 +36,12 @@ Rake::PackageTask.new(NAME, VERSION) do |p|
     p.package_files.include("lib/**/*.rb")
 	p.package_files.include("spec/**/*")
 	p.package_files.include("bin/*")
+	p.package_files.include("conf/*")
+	
 	p.package_files.include("Rakefile")
 	p.package_files.include("LICENSE.txt")
 	p.package_files.include("README.txt")
-	p.package_files.include("conf/*")
+	
 	p.package_files.include("testcases/**/*")
 end
 	
