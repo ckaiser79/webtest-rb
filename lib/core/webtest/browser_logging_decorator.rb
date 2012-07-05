@@ -40,73 +40,7 @@ module Webtest
 		end
 		
 	end
-	
-	class BrowserWithAssertions
-	
-		include Decorator
-		
-		def html
-			if @decorated.dumpOnInspection?
-				@decorated.dump 
-			end
-			return @decorated.html
-		end
 
-		def assertTitleMatches(titleRegexp)
-			if @decorated.dumpOnInspection?
-				@decorated.dump 
-			end
-			unless titleRegexp.match @decorated.title
-				raise Webtest::BrowserAssertionError, "title, is = " + @decorated.title + "', should match /" + titleRegexp.source + "/"
-			end
-		end
-		
-		def assertTitleInclude(titleRegexp)
-			if @decorated.dumpOnInspection?
-				@decorated.dump 
-			end
-			unless @decorated.title.include? title
-				raise Webtest::BrowserAssertionError, "title is = " + @decorated.title + "', should include = '" + title + "'"
-			end
-		end		
-		
-		def assertTextMatches(regexp)
-			if @decorated.dumpOnInspection?
-				@decorated.dump 
-			end
-			unless regexp.match @decorated.text
-				raise Webtest::BrowserAssertionError, "text source should match /" + regexp.source + "/" 
-			end
-		end
-		
-		def assertHtmlMatches(regexp)
-			if @decorated.dumpOnInspection?
-				@decorated.dump 
-			end
-			unless regexp.match @decorated.html
-				raise Webtest::BrowserAssertionError, "html source should match /" + regexp.source + "/"
-			end
-		end
-		
-		def assertHtmlInclude(text)
-			if @decorated.dumpOnInspection?
-				@decorated.dump 
-			end
-			unless @decorated.html.include? title
-				raise Webtest::BrowserAssertionError, "html of page should contain '" + text + "'"
-			end
-		end
-		
-		def assertTextInclude(text)
-			if @decorated.dumpOnInspection?
-				@decorated.dump 
-			end
-			unless @decorated.html.include? title
-				raise Webtest::BrowserAssertionError, "text of page should contain '" + text + "'"
-			end
-		end	
-	end
-	
 	class BrowserWithCacheAccess
 
 		include Decorator
@@ -141,17 +75,28 @@ module Webtest
 		end	
 
 		def dump(name = nil)
+
 		
 			filename = @filenameGenerateService.nextFilename "png", name
-			@decorated.driver.save_screenshot filename
+			WTAC.instance.log.info('Dump page screenshot and source ' + filename)
+			
+			begin
+				@decorated.driver.save_screenshot filename
+			rescue Exception => e
+				WTAC.instance.log.warn('Unable to dump screenshot for ' + filename)
+				WTAC.instance.log.warn(e.message + "\n" + e.backtrace.join("\n"))
+			end
 			
 			filename = @filenameGenerateService.lastFilename "html"			
-			htmlSource = @decorated.html 
-			file = File.open(filename, File::WRONLY | File::CREAT)
-			file.puts htmlSource
-			file.close
-
-			WTAC.instance.log.info('Dump page_source ' + filename)
+			begin
+				htmlSource = @decorated.html 
+				file = File.open(filename, File::WRONLY | File::CREAT)
+				file.puts htmlSource
+				file.close
+			rescue Exception => e
+				WTAC.instance.log.warn('Unable to dump html source for ' + filename)
+				WTAC.instance.log.warn(e.message + "\n" + e.backtrace.join("\n"))
+			end
 			
 		end
 		

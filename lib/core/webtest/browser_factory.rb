@@ -40,9 +40,7 @@ module Webtest
 		def newBrowser
 			browser = Watir::Browser.new @selectedBrowserType
 			
-			# order is important. assertingBrowser uses methods from dumpingBrowser
 			decoratedBrowser = BrowserWithDumper.new(browser)
-			decoratedBrowser = BrowserWithAssertions.new(decoratedBrowser)
 			decoratedBrowser = BrowserWithCacheAccess.new(decoratedBrowser)
 			
 			proxy = LoggingProxy.new(decoratedBrowser)
