@@ -1,4 +1,5 @@
 *~
+pkg/
 conf/webtest.yml
 log
 spec/vendor
