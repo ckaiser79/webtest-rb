@@ -1,7 +1,11 @@
 
 require 'fileutils'
 
-task :default => :rm_logs
+task :default => :help
+
+task :help do
+	puts "rake <rm_logs|rm_vendor|install>"
+end
 
 task :lgpl_prepare => [ :rm_vendor_files, :rm_logs ]
 
