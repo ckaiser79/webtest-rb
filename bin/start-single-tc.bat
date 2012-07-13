@@ -19,7 +19,7 @@ set TC=%TC:##=%
 ::set WT_OTPS=--verbose 
 set WT_OPTS=
 
-ruby wetest-rb %WT_OPTS% -t "../testcases/%TCGROUP%/%TC%"
+ruby webtest-rb %WT_OPTS% -t "../testcases/%TCGROUP%/%TC%"
 GOTO END
 
 :USAGE
