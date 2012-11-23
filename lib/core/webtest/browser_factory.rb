@@ -38,10 +38,20 @@ module Webtest
 		end
 	
 		def newBrowser
+		
+			config = WTAC.instance.config
+			
 			browser = Watir::Browser.new @selectedBrowserType
+			
+			browser.window.move_to(0,0)
+			browser.window.resize_to(
+				config.read('browser-tests:x-size').to_i, 
+				config.read('browser-tests:y-size').to_i
+			)
 			
 			decoratedBrowser = BrowserWithDumper.new(browser)
 			decoratedBrowser = BrowserWithCacheAccess.new(decoratedBrowser)
+			decoratedBrowser = BrowserWithBaseUrl.new(decoratedBrowser)
 			
 			proxy = LoggingProxy.new(decoratedBrowser)
 			proxy.log = WTAC.instance.log

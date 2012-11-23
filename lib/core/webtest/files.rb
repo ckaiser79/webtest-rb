@@ -3,14 +3,16 @@ module Webtest
 	module Files
 		
 		@@registeredAutoClosableFiles = Array.new 
+        @@registeredAutoFlushableFiles = Array.new 
 				
 		#
 		# File.open(filename, File::WRONLY | File::CREAT)
 		#
 		def self.openWriteCreate(filename)
-			return File.open(filename, File::WRONLY | File::CREAT)
+			file = File.open(filename, File::WRONLY | File::CREAT)
+            return file
 		end
-		
+
 		def self.close(file)
 			return if(file == nil)
 			file.close unless file.closed?
@@ -26,5 +28,22 @@ module Webtest
 				close(file)
 			end
 		end
+		
+        def self.flush(file)
+			return if(file == nil)
+			file.flush unless file.closed?
+		end
+                
+        def self.autoFlush(file)			
+			@@registeredAutoFlushableFiles.push file
+			return file
+		end
+
+		def self.flushAll()			
+			@@registeredAutoFlushableFiles.each do |file|
+				flush(file)
+			end
+		end
+
 	end	
 end

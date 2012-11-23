@@ -2,7 +2,7 @@
 module Webtest
 	module Browser
 		module PageObjectSupport
-
+		
 			def initialize(browser)
 				@browser = browser
 				raise "Invalid page content " + self.class.to_s if not correctBrowserContent?
@@ -15,7 +15,9 @@ module Webtest
 			def contentAsDriver
 				return @browser
 			end
+			alias :browser :contentAsDriver
 
 		end
+		
 	end
 end

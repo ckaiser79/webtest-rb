@@ -84,6 +84,10 @@ module Webtest
 			if(result == nil)
 				result = readOrReturnNil(@globalConfig, path)
 			end
+			
+			if(result == nil)
+				result = readOrReturnNil(@defaultsConfig, path)
+			end			
             
             varsubst = VariableSubstitution.new(self)
             result = varsubst.evaluate(result)
@@ -101,6 +105,10 @@ module Webtest
 				lastKey = item
 				lastHash = hash
 
+                #puts "lastKey=" + lastKey.to_s
+                #puts "lastHash=" + lastHash.to_s
+                #puts 
+                
 				hash = hash[item]
 				if(hash == nil) 
 					new_hash = {}
@@ -116,24 +124,27 @@ module Webtest
             @globalConfig = hash
         end
         
+		def loadApplicationDefaults(yamlString)
+			@defaultsConfig = doLoadConfiguration(yamlString)
+		end
+		
 		def loadGlobal(yamlString)
-			if(yamlString == nil) 
-				@globalConfig = nil
-			else                
-				@globalConfig = YAML.load(yamlString)
-			end		
-			
+			@globalConfig = doLoadConfiguration(yamlString)		
 		end
 
 		def loadLocal(yamlString)
-			if(yamlString == nil) 
-				@localConfig = nil
-			else
-				@localConfig = YAML.load(yamlString)
-			end		
+			@localConfig = doLoadConfiguration(yamlString)		
 		end
 
 		private
+		
+		def doLoadConfiguration(yamlString)
+			if(yamlString == nil) 
+				return nil
+			else                
+				return YAML.load(yamlString)
+			end
+		end
 
 		def readOrReturnNil(configuration, path)
 

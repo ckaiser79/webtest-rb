@@ -22,15 +22,18 @@ module SZ
 		def key(key)
 			return @messageSource.read(@prefix + key)
 		end
+		alias :read :key 
 	
 	end
+	
 	class TranslatorHolder
+	
 		include Singleton
 		
 		attr_accessor :translator
         attr_accessor :data
 		        
-        def data(key)
+        def dt(key)
 			return @data.key(key)
 		end
         

@@ -28,6 +28,9 @@ module Webtest
 		def init(yamlString)
 
 			@config = Webtest::Configuration.new
+
+			f = File.open(Dir.pwd + '/../lib/core/webtest/defaults-config.yml')
+			@config.loadApplicationDefaults(f)
 			@config.loadGlobal(yamlString)
 
 			ac = WTAC.instance
@@ -60,6 +63,7 @@ module Webtest
 			FileUtils.mkdir_p logdir
 			
 			logfile = File.open(logdir + "/" + RUN_LOGFILE, File::WRONLY | File::CREAT)
+            logfile.sync = true
 			log = Logger.new(logfile)
 
 			stdoutLog = Logger.new(STDOUT)
@@ -134,7 +138,7 @@ module Webtest
 		end
         
         def executeSingleTestcase(singleTestcase, useTestcaseDirectoryPrefix)
-        
+        			
             testrunner = buildAndConfigureTestrunner(singleTestcase, useTestcaseDirectoryPrefix)
             ac = WTAC.instance
                
@@ -148,6 +152,7 @@ module Webtest
                 end
                 ac.log.info("Finished execute test " + testrunner.to_s)
             else
+                testcasesHome = ac.config.read("main:testcase-directory")
                 ac.log.warn("Selected testcase '" + singleTestcase + "' is invalid (dir = '" + testcasesHome + "').")
             end
 
@@ -167,6 +172,7 @@ module Webtest
 				WTAC.instance.log.info "Result " +  testrunner.to_s
 			end
 			
+            # TODO flush logfile
 			idc.reset		
 		end
         
@@ -184,7 +190,6 @@ module Webtest
 		
 			testrunner = Webtest::ContextAwareTestrunner.new
 			testrunner.testEngine = engine
-            
             
                         
             if Pathname.new(singleTestcase).absolute?

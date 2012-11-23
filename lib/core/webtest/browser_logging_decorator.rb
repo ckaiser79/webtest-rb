@@ -53,6 +53,13 @@ module Webtest
 
 	end
 
+	class BrowserWithBaseUrl
+		include Decorator
+		
+		attr_accessor :baseUrl
+		
+	end
+	
 	class BrowserWithDumper
 	
 		include Decorator

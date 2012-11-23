@@ -10,7 +10,7 @@ browser-tests:
   # set to false, if browser should not be closed after testcase automatically
   autocloseBrowser: true
   #browser-type: chrome,firefox,ie
-  browser-type: firefox
+  browser-type: chrome
   y-size: 1280
   x-size: 960
   
@@ -21,4 +21,3 @@ testrun:
 data:
     
 i18n:
-

@@ -6,6 +6,8 @@ require 'fileutils'
 require 'rspec'
 require 'rspec/core/runner'
 require 'wtac'
+require 'sz/issue_definition_context'
+require 'pry'
 
 module Webtest
 
@@ -105,7 +107,7 @@ module Webtest
 			#
 						
 			WTAC.instance.log.debug("rc = " + rc.to_s)
-			if rc != 0
+			if @executionResult == "FAIL"
 				# scan for known issues and rerun each issue
 				Dir[@testcaseDir + '/spec*.rb'].each do |file|
 					executeIssueFileSpec(file)
@@ -115,9 +117,10 @@ module Webtest
 			BrowserFactory.closeAllBrowsers()
 					
 			Webtest::Files.close(out)
-			Webtest::Files.close(err)	
+			Webtest::Files.close(err)
 			
-			Webtest::Files.closeAll()			
+			Webtest::Files.closeAll()
+            Webtest::Files.flushAll()
 
 			ac.config.loadLocal(nil)
 			ac.log.localLogger = nil
@@ -131,12 +134,12 @@ module Webtest
 			
 			if issueName != nil
 				
-				issue = IssueDefinitionContext.instance.create(issueName)
+				issue = SZ::IssueDefinitionContext.instance.create(issueName)
 				WTAC.instance.log.info("Check for issue " + issue.to_s)
 				
 				@testEngine.testcaseSpec = file
 				
-				rc = executeTestEngine(bugName)
+				rc = executeTestEngine(issue.to_s)
 				issue.markDetected if(rc == 0)
 			
 			end
@@ -188,7 +191,7 @@ module Webtest
 		def configureLogging
 		
 			ac = WTAC.instance
-			logfile = File.open(@logDir + '/run.log', File::WRONLY | File::CREAT)
+            logfile = Webtest::Files.openWriteCreate(@logDir + '/run.log')
 			log = Logger.new(logfile)
 					
 			stdoutLog = Logger.new(STDOUT)
@@ -214,17 +217,16 @@ module Webtest
             
         def run
             if isContextAvailable
-                @logDir = @logDir + "/" + Webtest::TestcaseContext.instance.name 
+                @logDir = @logDir + "/" + Webtest::TestcaseContext.instance.name.to_s 
             end
             
             super
-		ensure
-			Webtest::TestcaseContext.instance.reset()
+
         end
         
 		def to_s
             if isContextAvailable
-                name = " @ " + Webtest::TestcaseContext.instance.name
+                name = " @ " + Webtest::TestcaseContext.instance.name.to_s
             else
                 name = ""
             end
