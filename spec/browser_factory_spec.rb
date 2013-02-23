@@ -1,5 +1,5 @@
 
-require '../lib/webtest'
+require '../lib/core/webtest'
 
 describe Webtest::BrowserFactory, "#newBrowser" do
 
@@ -56,4 +56,19 @@ browser-tests:
 		expect { browser = factory.newBrowser }.to raise_error
 	end
 	
+	it "use existing browser, after instance is returned" do
+		
+		factory = Webtest::BrowserFactory.new
+
+		browser1 = factory.borrowBrowser
+		browser1.goto "www.heise.de"
+
+		browser2 = factory.borrowBrowser
+		browser2.goto "www.gmx.de"
+
+		factory.returnBrowser browser1
+		browser3 = factory.borrowBrowser
+		browser3.goto "www.web.de"
+	end
+
 end

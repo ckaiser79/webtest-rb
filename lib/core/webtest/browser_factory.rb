@@ -34,11 +34,46 @@ module Webtest
 			end
 		
 			@selectedBrowserType = config.read('browser-tests:browser-type')
+			@browserPool = Array.new
 			
 		end
 	
 		def newBrowser
 		
+			proxy = createNewConfiguredBrowserInstance
+				
+			@@openBrowsers.push proxy if @autocloseBrowser
+			return proxy
+		end
+
+		#
+		# request a new browser or use an existing one
+		#
+		def borrowBrowser
+
+			if(@browserPool.empty?)
+				browser = createNewConfiguredBrowserInstance
+			else
+				browser = @browserPool.pop
+				browser.clearCache
+			end
+
+			# close browser if factory dies
+			ObjectSpace.define_finalizer(self, proc { browser.close })
+
+			return browser
+		end
+
+		#
+		# return a borrowed browser, if not needed anymore
+		#
+		def returnBrowser(browser)
+			@browserPool.push browser
+		end
+
+		private
+
+		def createNewConfiguredBrowserInstance
 			config = WTAC.instance.config
 			
 			browser = Watir::Browser.new @selectedBrowserType
@@ -59,8 +94,7 @@ module Webtest
 				'dump',
 				'dumpOnInspection'
 			]
-			
-			@@openBrowsers.push proxy if @autocloseBrowser
+
 			return proxy
 		end
 		
