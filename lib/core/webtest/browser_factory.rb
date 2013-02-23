@@ -15,7 +15,8 @@ module Webtest
 		
 		attr_reader :selectedBrowserType
 		attr_writer :autocloseBrowser
-		
+		attr_writer :reuseBrowser
+	
 		def self.closeAllBrowsers()
 			@@openBrowsers.each do |browser| 
 				if(browser != nil)
@@ -34,44 +35,38 @@ module Webtest
 			end
 		
 			@selectedBrowserType = config.read('browser-tests:browser-type')
-			@browserPool = Array.new
 			
+			@lastBrowserInstance = nil
+			@reuseBrowser = false
 		end
 	
-		def newBrowser
+		def newBrowser(mayReuse = true)
 		
-			proxy = createNewConfiguredBrowserInstance
-				
-			@@openBrowsers.push proxy if @autocloseBrowser
-			return proxy
-		end
-
-		#
-		# request a new browser or use an existing one
-		#
-		def borrowBrowser
-
-			if(@browserPool.empty?)
-				browser = createNewConfiguredBrowserInstance
+		
+			if(@reuseBrowser)
+				if(@lastBrowserInstance == nil)
+					@lastBrowserInstance = createNewSelfDestructingBrowser
+				end
 			else
-				browser = @browserPool.pop
-				browser.clearCache
+				@lastBrowserInstance = createNewSelfDestructingBrowser
+				@@openBrowsers.push @lastBrowserInstance if @autocloseBrowser
 			end
 
-			# close browser if factory dies
-			ObjectSpace.define_finalizer(self, proc { browser.close })
-
-			return browser
+			proxy = @lastBrowserInstance
+			return proxy
 		end
-
-		#
-		# return a borrowed browser, if not needed anymore
-		#
-		def returnBrowser(browser)
-			@browserPool.push browser
-		end
+		alias browser newBrowser
 
 		private
+
+		def createNewSelfDestructingBrowser
+			proxy = createNewConfiguredBrowserInstance
+
+			# close browser if factory dies
+			ObjectSpace.define_finalizer(self, proc { proxy.close unless proxy == nil })
+
+			return proxy
+		end
 
 		def createNewConfiguredBrowserInstance
 			config = WTAC.instance.config

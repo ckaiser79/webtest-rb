@@ -120,7 +120,7 @@ module Webtest
 			Webtest::Files.close(err)
 			
 			Webtest::Files.closeAll()
-            Webtest::Files.flushAll()
+		        Webtest::Files.flushAll()
 
 			ac.config.loadLocal(nil)
 			ac.log.localLogger = nil
