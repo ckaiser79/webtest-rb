@@ -100,7 +100,7 @@ module Webtest
 			@testEngine.testcaseSpec = @testcaseDir + '/spec.rb'
 			rc = RC_TESTENGINE_THROWS_EXCEPTION
             
-			executeTestEngine()
+			executeTestEngine
 			
 			#
 			# cleanup TODO put into own object
@@ -114,9 +114,8 @@ module Webtest
 				end
 			end
 			
-			logTestcaseSources
-						
-			BrowserFactory.closeAllBrowsers()
+			logTestcaseSources						
+			autocloseBrowsers
 					
 			Webtest::Files.close(out)
 			Webtest::Files.close(err)
@@ -169,9 +168,21 @@ module Webtest
 		
         private
 		
+		def autocloseBrowsers
+		
+			config = WTAC.instance.config
+			
+			if true?(config.read('browser-tests:autocloseBrowser'))
+				BrowserInstanceService.closeOwnBrowsers
+			end
+		end
+		
 		def logTestcaseSources
-			FileUtils.mkdir @logdir + '/src'
-			FileUtils.cp_r @testcaseDir + '/*', @logdir + '/src'
+			src = @logDir + '/src'
+			if not File.directory?(src)
+				FileUtils.mkdir src
+			end
+			FileUtils.cp_r Dir.glob(@testcaseDir + '/*'), src
 		end
         
 		def setTestcaseResult(rc)

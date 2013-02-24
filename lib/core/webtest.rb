@@ -11,6 +11,7 @@ require 'webtest/testrunner'
 
 #order is important here
 require 'webtest/browser_logging_decorator'
+require 'webtest/browser_instance_service'
 require 'webtest/browser_factory'
 
 require 'webtest/testcase_locator_service'
@@ -22,6 +23,7 @@ module Webtest
 		return false if booleanString == false || booleanString =~ (/(false|f|no|n|0)$/i)
 		raise ArgumentError.new("invalid value for Boolean: \"#{booleanString}\"")
 	end
+	alias :true? :isTrue
 
 end
 

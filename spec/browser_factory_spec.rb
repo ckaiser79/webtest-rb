@@ -1,5 +1,6 @@
 
-require '../lib/core/webtest'
+require 'webtest'
+require 'pry'
 
 describe Webtest::BrowserFactory, "#newBrowser" do
 
@@ -9,29 +10,27 @@ describe Webtest::BrowserFactory, "#newBrowser" do
 ---
 browser-tests:
   browser-type: ff
+  x-size: 800
+  y-size: 600
 ") 
 
 		WTAC.instance.config = config
+		@factory = Webtest::BrowserFactory.new
+		
 	end
-
+	
 	it "should generate a new browser object" do
-		factory = Webtest::BrowserFactory.new
-		browser = factory.newBrowser
-		expect { browser != nil }
-		browser.close
-	end
-	
-	it "should autoclose open browsers" do
-	
-		factory = Webtest::BrowserFactory.new
 		
-		factory.newBrowser
-		factory.newBrowser.close
-		factory.newBrowser
+		browser1 = @factory.newBrowser
+		browser1.should_not be_nil 
 		
-		 Webtest::BrowserFactory.closeAllBrowsers
+		browser2 = @factory.newBrowser
+		browser2.should_not == browser1
+		
+		browser1.close
+		browser2.close
 	end
-	
+		
 	it "should return borwser based on configuration" do
 	
 		WTAC.instance.config.loadLocal("
@@ -39,9 +38,8 @@ browser-tests:
 browser-tests:
   browser-type: chrome
 ")	
-		factory = Webtest::BrowserFactory.new
-		browser = factory.newBrowser
-		browser.goto "www.heise.de"
+		@factory = Webtest::BrowserFactory.new
+		browser = @factory.newBrowser
 		browser.close
 	end
 	
@@ -52,23 +50,8 @@ browser-tests:
   browser-type: bad_browser
 ")
 
-		factory = Webtest::BrowserFactory.new
-		expect { browser = factory.newBrowser }.to raise_error
+		@factory = Webtest::BrowserFactory.new
+		expect { browser = @factory.newBrowser }.to raise_error
 	end
 	
-	it "use existing browser, after instance is returned" do
-		
-		factory = Webtest::BrowserFactory.new
-
-		browser1 = factory.borrowBrowser
-		browser1.goto "www.heise.de"
-
-		browser2 = factory.borrowBrowser
-		browser2.goto "www.gmx.de"
-
-		factory.returnBrowser browser1
-		browser3 = factory.borrowBrowser
-		browser3.goto "www.web.de"
-	end
-
 end

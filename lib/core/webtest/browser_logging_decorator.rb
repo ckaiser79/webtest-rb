@@ -33,7 +33,13 @@ module Webtest
 			
 			if(!@excludes.include?(method.to_s))
 				shortName = @target.class.name.gsub(/^.*::/,'')
-				@log.info("Invoke " + shortName + "#" + method.to_s + " " + args.to_s)			
+				msg = "Invoke " + shortName + "#" + method.to_s + " " + args.to_s
+				
+				if @log != nil
+					@log.info msg
+				else
+					puts msg
+				end
 			end
 			
 			@target.send(method, *args, &block)
@@ -70,10 +76,10 @@ module Webtest
 			return @dumpOnInspection
 		end
 			
-		def initialize(decorated, config = nil)
+		def initialize(decorated)
 			@decorated = decorated
 			
-			config = config ||= WTAC.instance.config
+			config = WTAC.instance.config
 			@selectedBrowserType = config.read('browser-tests:browser-type')
 			
 			@filenameGenerateService = SZ::NumericPrefixGenerateService.instance
