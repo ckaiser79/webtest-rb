@@ -266,4 +266,57 @@ module Webtest
 		
 		end
 	end
+	
+	class Adviceable
+	
+		attr_writer :beforeAdvices
+		attr_writer :onReturnAdvices
+		attr_writer :onErrorAdvices
+		attr_writer :finallyAdvices
+	
+		attr_writer :runnable
+		
+		def initialize
+		
+			@beforeAdvices = Array.new
+			@onReturnAdvices = Array.new
+			@onErrorAdvices = Array.new
+			@finallyAdvices = Array.new
+			
+			@runnable = nil
+			
+		end
+		
+		def run
+		
+			error = nil
+			result = nil
+			
+			@beforeAdvices.each do |advice|
+				advice.run
+			end
+		
+			begin
+				result = runnable.run
+			rescue e
+				error = e
+			end
+			
+			if(error =! nil)
+				@onErrorAdvices.each do |advice|
+					advice.run e
+				end
+			else
+				@onReturnAdvices.each do |advice|
+					advice.run result
+				end
+			end
+		
+		ensure
+			@finallyAdvices.each do |advice|
+				advice.run result, e
+			end
+		end
+	
+	end
 end
