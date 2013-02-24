@@ -113,6 +113,8 @@ module Webtest
 					executeIssueFileSpec(file)
 				end
 			end
+			
+			logTestcaseSources
 						
 			BrowserFactory.closeAllBrowsers()
 					
@@ -166,6 +168,11 @@ module Webtest
 		end
 		
         private
+		
+		def logTestcaseSources
+			FileUtils.mkdir @logdir + '/src'
+			FileUtils.cp_r @testcaseDir + '/*', @logdir + '/src'
+		end
         
 		def setTestcaseResult(rc)
 			if(rc != 0)
