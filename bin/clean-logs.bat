@@ -1,3 +1,3 @@
 pushd ..
-rake rm_logs
+call rake rm_logs
 popd

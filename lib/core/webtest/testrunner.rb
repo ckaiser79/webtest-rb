@@ -173,7 +173,7 @@ module Webtest
 			config = WTAC.instance.config
 			
 			if true?(config.read('browser-tests:autocloseBrowser'))
-				BrowserInstanceService.closeOwnBrowsers
+				BrowserInstanceService.instance.closeOwnBrowsers
 			end
 		end
 		
