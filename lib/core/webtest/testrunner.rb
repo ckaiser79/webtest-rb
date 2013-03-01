@@ -336,6 +336,8 @@ module Webtest
 	
 	class ExecuteTestcaseAdvice
 	
+		include Webtest
+	
 		RC_TESTENGINE_THROWS_EXCEPTION = -1
 	
 		attr_writer :suffix
@@ -367,7 +369,10 @@ module Webtest
 			end
 			
 			setTestcaseResult(rc)
-			
+	
+			if true?(ac.config.read('browser-tests:autocloseBrowser'))
+				BrowserInstanceService.instance.closeOwnBrowsers
+			end
 		end
 
 		def setTestcaseResult(rc)
