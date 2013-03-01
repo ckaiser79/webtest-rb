@@ -287,14 +287,15 @@ module Webtest
 			
 		end
 		
-		def onReturn(result = nil, error = nil)
+		def onReturn
 			
 			if @executionResult == "FAIL"
 			
 				@executeTestcaseAdvice.testEngine = @testEngine
-				
+				binding.pry
 				# scan for known issues and rerun each issue
 				Dir[@testcaseDir + '/spec*.rb'].each do |file|
+					
 					executeIssueFileSpec(file)
 				end
 			end
