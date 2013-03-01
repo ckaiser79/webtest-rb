@@ -41,6 +41,21 @@ def readCommandlineArguments
 		opts.on( '-b', '--browser <ie|firefox|chrome>', 'Run testcase using this browser' ) do|file|
 			options[:browser] = file
 		end		
+		
+		options[:run_all] = false
+		opts.on( '-r', '--run-all', 'Run all selected testcases' ) do
+			options[:run_all] = true
+		end	
+
+		options[:remove_logs] = false
+		opts.on( '-c', '--remove-logs', 'Remove logdirectory before running tests' ) do
+			options[:remove_logs] = true
+		end	
+		
+		options[:print_summary]
+		opts.on( '-p', '--print-summary', 'Print a summary of all results based on last created logfile.' ) do
+			options[:print_summary] = true
+		end	
 	 
 		# This displays the help screen, all programs are
 		# assumed to have this option.
@@ -54,25 +69,42 @@ def readCommandlineArguments
 	return options
 end
 
-webtest = Webtest::Startup.instance
+
+def initConfiguration(fileName)
+
+	yamlString = File.open(fileName)
+	@config = Webtest::Configuration.new
+
+	f = File.open(Dir.pwd + '/../lib/core/webtest/defaults-config.yml')
+	@config.loadApplicationDefaults(f)
+	@config.loadGlobal(yamlString)
+
+	ac = WTAC.instance
+	ac.config = @config
+end
+
+
 options = readCommandlineArguments
 
-if(options[:config] == nil) 
+if options[:config] == nil 
 	options[:config] = '../conf/webtest.yml'
 end
 
-webtest.init(File.open(options[:config]))
-config = webtest.config
+initConfiguration options[:config]
+config = WTAC.instance.config
 
-if(options[:logfile] != nil) 
+if options[:logfile] != nil 
 	config.saveGlobalValue("main:logfile", options[:logfile])
+else
+	logdir = config.read("main:logdir")	
+	config.saveGlobalValue("main:logfile", logdir + '/' + Webtest::DEFAULT_RUN_LOGFILE)
 end
-
-if(options[:browser] != nil) 
+	
+if options[:browser] != nil 
 	config.saveGlobalValue("browser-tests:browser-type", options[:browser])
 end
 
-if(options[:testcase] != nil) 
+if options[:testcase] != nil
 	config.saveGlobalValue("testrun:testcase", options[:testcase])
 else
 	config.saveGlobalValue("testrun:testcase", "<empty>")
@@ -80,5 +112,25 @@ end
 
 config.saveGlobalValue("main:verbose", options[:verbose].to_s)
 
-webtest.run
+if options[:remove_logs]
+	logDir = config.read('main:logdir')
+	puts "Remove logdir " + logDir if config.read('main:verbose')
+	FileUtils.rm_rf(logDir)
+	puts "Done" + logDir if config.read('main:verbose')
+end
 
+if options[:run_all] || options[:testcase] != nil
+	webtest = Webtest::Startup.instance
+	webtest.run
+end
+
+if options[:print_summary]
+	
+	fileName = config.read('main:logfile')
+	service = Webtest::LogfileResultPrintingService.instance
+	
+	puts ""
+	puts service.allFailures(fileName).join("")
+	puts service.allIssues(fileName).join("")
+	puts service.allSucceeds(fileName).join("")
+end

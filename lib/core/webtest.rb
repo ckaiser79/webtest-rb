@@ -13,10 +13,15 @@ require 'webtest/testrunner'
 require 'webtest/browser_logging_decorator'
 require 'webtest/browser_instance_service'
 require 'webtest/browser_factory'
+require 'webtest/logfile_result_printing_service'
 
 require 'webtest/testcase_locator_service'
 
+
+
 module Webtest
+
+	DEFAULT_RUN_LOGFILE = 'run.log'
 
 	def isTrue(booleanString)
 		return true if booleanString == true || booleanString =~ (/(true|t|yes|y|1)$/i)
