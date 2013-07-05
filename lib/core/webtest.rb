@@ -7,6 +7,7 @@ require 'webtest/second_logger_decorator'
 require 'webtest/testcase_context'
 require 'webtest/testcase_context_loader'
 require 'webtest/testrunner'
+require 'webtest/test_execution_to_yaml_event_listener'
 
 
 #order is important here
