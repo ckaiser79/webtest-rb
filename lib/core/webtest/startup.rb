@@ -18,26 +18,16 @@ require 'sz'
 module Webtest
 	class Startup
 
-		RUN_LOGFILE = "run.log"
 
 		include Singleton
 		include Webtest
 		
 		attr_reader :config
 
-		def init(yamlString)
-
-			@config = Webtest::Configuration.new
-
-			f = File.open(Dir.pwd + '/../lib/core/webtest/defaults-config.yml')
-			@config.loadApplicationDefaults(f)
-			@config.loadGlobal(yamlString)
-
-			ac = WTAC.instance
-			ac.config = @config
-
+		def initialize
+			@config = WTAC.instance.config
 		end
-
+		
 		def run
 		
 			configureLogging
@@ -57,12 +47,11 @@ module Webtest
 		
 		def configureLogging
 			
-			logdir = @config.read("main:logdir")
-
-			FileUtils.rm_rf logdir
-			FileUtils.mkdir_p logdir
+			logDir = config.read('main:logdir')
+			FileUtils.mkdir_p(logDir)
 			
-			logfile = File.open(logdir + "/" + RUN_LOGFILE, File::WRONLY | File::CREAT)
+			logfileName = @config.read('main:logfile')
+			logfile = File.open(logfileName, File::WRONLY | File::CREAT)
             logfile.sync = true
 			log = Logger.new(logfile)
 
@@ -148,12 +137,12 @@ module Webtest
                     testrunner.run
                 rescue Exception => e
                     ac.log.error("Abort TC Run: " + e.message)
-                    ac.log.error e.backtrace
+                    ac.log.error e.backtrace.join("\n")
                 end
                 ac.log.info("Finished execute test " + testrunner.to_s)
             else
                 testcasesHome = ac.config.read("main:testcase-directory")
-                ac.log.warn("Selected testcase '" + singleTestcase + "' is invalid (dir = '" + testcasesHome + "').")
+                ac.log.warn("Selected testcase '" + singleTestcase + "' is invalid (testcasesHome = '" + testcasesHome + "').")
             end
 
         ensure
@@ -185,12 +174,8 @@ module Webtest
         def buildAndConfigureTestrunner(singleTestcase, useTestcaseDirectoryPrefix)
         	ac = WTAC.instance
 			logDir = ac.config.read("main:logdir")		
-            
-            engine = Webtest::RspecTestEngine.new
-		
-			testrunner = Webtest::ContextAwareTestrunner.new
-			testrunner.testEngine = engine
-            
+            		
+			testrunner = Webtest::ContextAwareTestrunner.new			
                         
             if Pathname.new(singleTestcase).absolute?
                 testcaseLogDir = logDir + "/" + guessTestcaseDirectoryByAbsolutePath(singleTestcase)
@@ -254,7 +239,7 @@ module Webtest
 			
 			Dir.foreach(logdir) do |entry|
 				WTAC.instance.log.debug "abortIfLogDirectoryNotClean: directory scan, entry='" + entry + "'"
-                raise "Log directory is not clean" unless entry == RUN_LOGFILE or entry == '.' or entry == '..'
+                raise "Log directory is not clean" unless entry == Webtest::DEFAULT_RUN_LOGFILE or entry == '.' or entry == '..'
 			end
 		end
 	end

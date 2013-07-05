@@ -11,8 +11,6 @@ module Webtest
 
 		include Webtest
 	
-		@@openBrowsers = Array.new
-		
 		attr_reader :selectedBrowserType
 		attr_writer :autocloseBrowser
 		attr_writer :reuseBrowser
@@ -36,6 +34,14 @@ module Webtest
 		
 			@selectedBrowserType = config.read('browser-tests:browser-type')
 			
+			sizeX = config.read('browser-tests:x-size').to_i
+			sizeY = config.read('browser-tests:y-size').to_i
+			
+			service = Webtest::BrowserInstanceService.instance
+			service.selectedBrowserType = @selectedBrowserType
+			service.sizeX = sizeX
+			service.sizeY = sizeY
+			
 			@lastBrowserInstance = nil
 			@reuseBrowser = false
 		end
@@ -43,7 +49,7 @@ module Webtest
 		def newBrowser(mayReuse = true)
 		
 		
-			if(@reuseBrowser)
+			if(mayReuse && @reuseBrowser)
 				if(@lastBrowserInstance == nil)
 					@lastBrowserInstance = createNewSelfDestructingBrowser
 				end
@@ -96,3 +102,4 @@ module Webtest
 	end
 
 end
+

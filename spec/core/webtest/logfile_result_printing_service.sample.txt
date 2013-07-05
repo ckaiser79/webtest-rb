@@ -1,0 +1,8 @@
+1 [FAIL]
+2 [FAIL]
+3 [SUCCESS]
+4 [SUCCESS]
+5 [FAIL]
+6 WARN -- : Detected issue:
+logfile_result_printing_service.sample.txt
+logfile_result_printing_service.sample.txt
