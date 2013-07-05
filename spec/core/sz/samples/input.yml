@@ -1,0 +1,14 @@
+---
+eventlog:
+- !ruby/object:Webtest::ExportableTestResult
+  events:
+  - !ruby/object:Webtest::TestResultEvent
+    timestamp: 2013-07-05 16:39:02.357788765 +02:00
+    eventId: :testexecution_begins
+    result: :unknown
+  - !ruby/object:Webtest::TestResultEvent
+    timestamp: 2013-07-05 16:39:36.280777855 +02:00
+    eventId: :testexecution_returns
+    result: :fail
+  name: 001 - Throws error
+  source: ../testcases/samples/001 - Throws error/

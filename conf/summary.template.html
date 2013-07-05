@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+
+	<link href="../conf/css/bootstrap.css" rel="stylesheet">
+	<style>
+body {
+	padding-top: 60px; /* 60px to make the container go all the way to the bottom of the topbar */
+	padding-left: 120px;
+}
+	</style>
+<body>
+	<h1>Testresults</h1>
+
+	<% for @item in @data %>
+	<div>
+		<h2><%= @item.name %></h2>
+		<p>
+			<a href="<%= @item.source %>">
+				Goto logfile
+			</a>
+		</p>
+	
+		<% for @event in @item.events %>
+		<div class="<%= @event.eventId %>">
+			<table>
+				<tbody>
+					<tr>
+						<td>ID:</td>
+						<td><%= @event.eventId %></td>
+					</tr>
+					<tr>
+						<td>RESULT:</td>
+						<td><%= @event.result %></td>
+					</tr>
+					<tr>
+						<td>TIMESTAMP:</td>
+						<td><%= @event.timestamp %></td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+		<% end %>
+	</div>
+	<% end %>
+
+</body>
+</html>
+
+
+

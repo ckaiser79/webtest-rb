@@ -37,6 +37,8 @@ module Webtest
 
 			abortIfLogDirectoryNotClean
 			executeAllSelectedTestcases
+
+			generateHtmlReport
 			
 			ac.log.info("Stopped")
 			ac.close
@@ -45,6 +47,19 @@ module Webtest
 		
 		private
 		
+		def generateHtmlReport
+			service = SZ::YamlToTemplateRenderService.instance
+			
+			logfileName = @config.read('main:logfile')
+			yamlData = YAML::load_file(logfileName + '.yml')
+			templateFile = @config.read('main:html_reports:template_summary')
+			destinationFile = logfileName + '.html'
+
+			bindingData = SZ::BindingContainer.new(yamlData['eventlog']).exposeBinding
+			service.renderAsFile(bindingData, templateFile, destinationFile)
+
+		end
+
 		def configureLogging
 			
 			logDir = config.read('main:logdir')
