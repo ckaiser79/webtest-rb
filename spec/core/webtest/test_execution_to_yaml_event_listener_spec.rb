@@ -37,7 +37,7 @@ main:
                 @runner.logDir = LOGDIR
 
 		@resultFileName = 'testexecution_to_yaml_event_listener.out.yml'
-		@object = Webtest::Txl.new @resultFileName
+		@object = Webtest::TestrunnerEventLogger.new @resultFileName
 		@object.testrunner = @runner
 
 	end

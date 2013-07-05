@@ -40,8 +40,7 @@ module Webtest
 	end
 
 
-	#class TestexecutionToYamlEventListener
-	class Txl
+	class TestrunnerEventLogger
 
 		attr_writer :testrunner
 
