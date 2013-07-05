@@ -16,6 +16,29 @@ require 'sz'
 
 
 module Webtest
+
+
+	module PathUtils
+		def self.getTestcaseLogDirectory(singleTestcase)
+		    
+			absoluteTestcasePath = File.expand_path(singleTestcase)
+			ac = WTAC.instance
+			logDir = ac.config.read("main:logdir")
+			testcaseHomeDirectory = testcasesHome = ac.config.read("main:testcase-directory")
+
+			result = "tc"
+
+			if absoluteTestcasePath =~ /^(#{testcaseHomeDirectory})\/?(.+)$/i
+				result = $2
+			end
+
+			ac.log.debug("TC path = " + absoluteTestcasePath);
+			ac.log.debug("TC logdir = " + result);
+
+			return logDir + "/" + result
+		end
+	end
+
 	class Startup
 
 
@@ -194,15 +217,13 @@ module Webtest
 		end
         
 		def buildAndConfigureTestrunner(singleTestcase, useTestcaseDirectoryPrefix)
-			ac = WTAC.instance
-			logDir = ac.config.read("main:logdir")		
-            		
-			testrunner = Webtest::ContextAwareTestrunner.new			
                         
-			absoluteTestcasePath = File.expand_path(singleTestcase)
-			testcaseLogDir = logDir + "/" + guessTestcaseDirectoryByAbsolutePath(absoluteTestcasePath)
-	
+			testcaseLogDir = Webtest::PathUtils::getTestcaseLogDirectory(singleTestcase)
+			
+			testrunner = Webtest::ContextAwareTestrunner.new
 			testrunner.logDir = testcaseLogDir
+
+			ac = WTAC.instance
 
 			if useTestcaseDirectoryPrefix
 				testcasesHome = ac.config.read("main:testcase-directory")
@@ -235,23 +256,6 @@ module Webtest
 			log.sendToBoth = true
 			log.localLogger = nil
 		end
-
-		def guessTestcaseDirectoryByAbsolutePath(absoluteTestcasePath)
-		    
-			ac = WTAC.instance
-			testcaseHomeDirectory = testcasesHome = ac.config.read("main:testcase-directory")
-
-			result = "tc"
-
-			if absoluteTestcasePath =~ /^(#{testcaseHomeDirectory})\/?(.+)$/i
-			result = $2
-			end
-
-			ac.log.debug("TC path = " + absoluteTestcasePath);
-			ac.log.debug("TC logdir = " + result);
-
-			return result
-		end
 			
 		def abortIfLogDirectoryNotClean
 		
@@ -268,4 +272,5 @@ module Webtest
 			end
 		end
 	end
+
 end

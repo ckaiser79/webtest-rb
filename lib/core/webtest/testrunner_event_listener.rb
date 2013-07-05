@@ -9,6 +9,7 @@ module Webtest
 
 	class ExportableTestResult
 		attr_accessor :name
+		attr_accessor :context
 		attr_accessor :source
 		attr_reader   :events
 
@@ -82,7 +83,11 @@ module Webtest
 
 			dto = ExportableTestResult.new
 			dto.name = @testrunner.testcaseName
-			dto.source = @testrunner.testcaseDir
+			dto.context = Webtest::TestcaseContext.instance.name
+
+			testcaseLogDir = Webtest::PathUtils::getTestcaseLogDirectory(@testrunner.testcaseDir)
+			dto.source = testcaseLogDir
+			
 			return dto
 		end
 
