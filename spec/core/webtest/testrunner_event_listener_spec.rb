@@ -3,7 +3,7 @@ require 'wtac'
 require 'logger'
 require 'webtest'
 require 'webtest/testrunner'
-require 'webtest/test_execution_to_yaml_event_listener'
+require 'webtest/testrunner_event_listener'
 require 'pry'
 
 LOGDIR = '../log'

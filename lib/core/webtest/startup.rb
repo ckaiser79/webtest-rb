@@ -172,73 +172,72 @@ module Webtest
 			idc.reset		
 		end
 
-        def getAllTestcaseContexts(singleTestcase)
-            loader = Webtest::TestcaseContextLoader.new
-            loader.testcaseHomeDirectory = testcaseHomeDirectory(singleTestcase)
-            return loader.loadAvailableContexts()
-        end
+		def getAllTestcaseContexts(singleTestcase)
+			loader = Webtest::TestcaseContextLoader.new
+			loader.testcaseHomeDirectory = testcaseHomeDirectory(singleTestcase)
+			return loader.loadAvailableContexts()
+		end
         
-        def buildAndConfigureTestrunner(singleTestcase, useTestcaseDirectoryPrefix)
-        	ac = WTAC.instance
+		def buildAndConfigureTestrunner(singleTestcase, useTestcaseDirectoryPrefix)
+			ac = WTAC.instance
 			logDir = ac.config.read("main:logdir")		
             		
 			testrunner = Webtest::ContextAwareTestrunner.new			
                         
-            if Pathname.new(singleTestcase).absolute?
-                testcaseLogDir = logDir + "/" + guessTestcaseDirectoryByAbsolutePath(singleTestcase)
-            else
-                # should work in most cases. I expect to work with absolute directories
-                testcaseLogDir = logDir + "/" + singleTestcase
-            end
-            
+			absoluteTestcasePath = File.expand_path(singleTestcase)
+			testcaseLogDir = logDir + "/" + guessTestcaseDirectoryByAbsolutePath(absoluteTestcasePath)
+	
 			testrunner.logDir = testcaseLogDir
-			
-            if useTestcaseDirectoryPrefix
-                testcasesHome = ac.config.read("main:testcase-directory")
-                ac.log.debug "Using TC Home " + testcasesHome
-                singleTestcase = singleTestcase.gsub(/^#{testcasesHome}\/?/, "")
-            
-                testrunner.testcaseDir = testcasesHome + "/" + singleTestcase
-			
-            else
-                testrunner.testcaseDir = singleTestcase
-            end
-            
-            return testrunner
-        end
+
+			if useTestcaseDirectoryPrefix
+				testcasesHome = ac.config.read("main:testcase-directory")
+				ac.log.debug "Using TC Home " + testcasesHome
+				singleTestcase = singleTestcase.gsub(/^#{testcasesHome}\/?/, "")
+
+				testrunner.testcaseDir = testcasesHome + "/" + singleTestcase
+
+			else
+				testrunner.testcaseDir = singleTestcase
+			end
+
+			return testrunner
+		end
         
-        def testcaseHomeDirectory(singleTestcase)
-			
+		def testcaseHomeDirectory(singleTestcase)
+				
 			WTAC.instance.log.info "singleTestcase = " + singleTestcase
-		
-            if Pathname.new(singleTestcase).absolute?
-                return singleTestcase
-            else
-                testcasesHome = WTAC.instance.config.read("main:testcase-directory")
-                return testcasesHome + "/" + singleTestcase
-            end
-        end
-        
-        def removeTestcaseLogger
-            log = WTAC.instance.log
-            log.sendToBoth = true
-            log.localLogger = nil
-        end
-        
-        def guessTestcaseDirectoryByAbsolutePath(absoluteTestcasePath)
-            
-            ac = WTAC.instance
-            testcaseHomeDirectory = testcasesHome = ac.config.read("main:testcase-directory")
-            
-            result = "tc"
-            
-            if absoluteTestcasePath =~ /^(#{testcaseHomeDirectory})\/?(.+)$/i
-                result = $2
-            end
-            
-            return result
-        end
-        
+			
+			if Pathname.new(singleTestcase).absolute?
+				return singleTestcase
+			else
+				testcasesHome = WTAC.instance.config.read("main:testcase-directory")
+				return testcasesHome + "/" + singleTestcase
+			end
+		end
+
+		def removeTestcaseLogger
+			log = WTAC.instance.log
+			log.sendToBoth = true
+			log.localLogger = nil
+		end
+
+		def guessTestcaseDirectoryByAbsolutePath(absoluteTestcasePath)
+		    
+			ac = WTAC.instance
+			testcaseHomeDirectory = testcasesHome = ac.config.read("main:testcase-directory")
+
+			result = "tc"
+
+			if absoluteTestcasePath =~ /^(#{testcaseHomeDirectory})\/?(.+)$/i
+			result = $2
+			end
+
+			ac.log.debug("TC path = " + absoluteTestcasePath);
+			ac.log.debug("TC logdir = " + result);
+
+			return result
+		end
+			
 		def abortIfLogDirectoryNotClean
 		
 			logdir = @config.read("main:logdir")
