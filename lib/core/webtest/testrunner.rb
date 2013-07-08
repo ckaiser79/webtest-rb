@@ -292,7 +292,6 @@ module Webtest
 			if @executionResult == "FAIL"
 			
 				@executeTestcaseAdvice.testEngine = @testEngine
-				binding.pry
 				# scan for known issues and rerun each issue
 				Dir[@testcaseDir + '/spec*.rb'].each do |file|
 					
