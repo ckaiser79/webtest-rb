@@ -18,9 +18,11 @@ module Webtest
 		
 		def findTestcases(*baseDirectories)
 	
+			
 			result = Array.new
 			
 			baseDirectories.each do |path| 				
+				WTAC.instance.log.info('Using path "' + path.to_s + '"') 
 				testcases = findTestcasesSingleDirectory(path)
 				result.concat testcases
 			end
