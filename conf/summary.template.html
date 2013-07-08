@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+
+	<link href="../conf/css/bootstrap.css" rel="stylesheet">
+	<style>
+body {
+	padding-top: 60px; /* 60px to make the container go all the way to the bottom of the topbar */
+	padding-left: 120px;
+}
+
+.events td { padding-left: 15px; }
+thead td { font-weight: bold; }
+
+tr.testexecution_begins td { border-top: 1px black solid; }
+
+.success { background-color: green; }
+.fail { background-color: red; }
+.error { background-color: red; }
+
+	</style>
+<body>
+	<h1>Testresults</h1>
+
+	<table>
+	<thead>
+		<tr>
+			<td>EVENT</td>
+			<td>Timestamp</td>
+			<td>TESTCASE</td>
+			<td>CONTEXT</td>
+			<td>RESULT</td>
+		</tr>
+	</thead>
+	<tbody>	
+	<% for @item in @data %>
+		<% for @event in @item.events %>
+
+		<tr class="<%= @event.result %> <%= @event.eventId %>">
+			<td class="eventId">
+			<% if @event.eventId.to_s == 'testexecution_begins' %>
+			&gt;&gt;
+			<% elsif @event.eventId.to_s == 'testexecution_returns' %>
+			&lt;&lt;
+			<% else %>
+			!!
+			<% end %>
+			</td>
+			<td><%= @event.timestamp.strftime('%Y-%m-%d %H:%M:%S') %></td>
+			<td>
+				<a href="<%= @item.source %>" target="logs">
+				<%= @item.name %> 				
+				</a>, 	
+				<% if @item.context != 'unknown-context' %>
+				<a href="<%= @item.source %>/<%= @item.context %>/rspec-stderr.txt" target="logs">
+				<% else %>			
+				<a href="<%= @item.source %>/rspec-stderr.txt" target="logs">
+				<% end %>
+				rspec-stderr.txt
+				</a>
+			</td>
+			<td class="context">
+				<% if @item.context != 'unknown-context' %>
+				<%= @item.context %>
+				<% end %>
+			</td>
+			
+			<td class="result"><%= @event.result %></td>
+		</tr>
+
+		<% end %>
+	<% end %>
+	</tbody>
+	</table>
+
+</body>
+</html>
+
+
+

@@ -16,6 +16,29 @@ require 'sz'
 
 
 module Webtest
+
+
+	module PathUtils
+		def self.getTestcaseLogDirectory(singleTestcase)
+		    
+			absoluteTestcasePath = File.expand_path(singleTestcase)
+			ac = WTAC.instance
+			logDir = ac.config.read("main:logdir")
+			testcaseHomeDirectory = testcasesHome = ac.config.read("main:testcase-directory")
+
+			result = "tc"
+
+			if absoluteTestcasePath =~ /^(#{testcaseHomeDirectory})\/?(.+)$/i
+				result = $2
+			end
+
+			ac.log.debug("TC path = " + absoluteTestcasePath);
+			ac.log.debug("TC logdir = " + result);
+
+			return logDir + "/" + result
+		end
+	end
+
 	class Startup
 
 
@@ -35,8 +58,10 @@ module Webtest
 			ac = WTAC.instance
 			ac.log.info("Started")
 
-            abortIfLogDirectoryNotClean
+			abortIfLogDirectoryNotClean
 			executeAllSelectedTestcases
+
+			generateHtmlReport
 			
 			ac.log.info("Stopped")
 			ac.close
@@ -45,6 +70,19 @@ module Webtest
 		
 		private
 		
+		def generateHtmlReport
+			service = SZ::YamlToTemplateRenderService.instance
+			
+			logfileName = @config.read('main:logfile')
+			yamlData = YAML::load_file(logfileName + '.yml')
+			templateFile = @config.read('main:html_reports:template_summary')
+			destinationFile = logfileName + '.html'
+
+			bindingData = SZ::BindingContainer.new(yamlData['eventlog']).exposeBinding
+			service.renderAsFile(bindingData, templateFile, destinationFile)
+
+		end
+
 		def configureLogging
 			
 			logDir = config.read('main:logdir')
@@ -52,7 +90,7 @@ module Webtest
 			
 			logfileName = @config.read('main:logfile')
 			logfile = File.open(logfileName, File::WRONLY | File::CREAT)
-            logfile.sync = true
+			logfile.sync = true
 			log = Logger.new(logfile)
 
 			stdoutLog = Logger.new(STDOUT)
@@ -60,8 +98,8 @@ module Webtest
 			
 			decoratedLog = SecondLoggerDecorator.newPassthroughLogger(log, stdoutLog)
             
-            targetLog = SecondLoggerDecorator.new(decoratedLog)
-            targetLog.sendToBoth = true
+			targetLog = SecondLoggerDecorator.new(decoratedLog)
+			targetLog.sendToBoth = true
             
 			if(isTrue(@config.read("main:verbose")))
 				targetLog.level = Logger::DEBUG
@@ -71,10 +109,12 @@ module Webtest
 				targetLog.debug("Running in info mode")
 			end
             
-            WTAC.instance.log = targetLog
+			WTAC.instance.log = targetLog
 			WTAC.instance.log.debug "Test debug mode"
+
+			@testrunnerEventLogger = Webtest::TestrunnerEventLogger.new logfileName + '.yml'
 		end
-        
+
 		def executeAllSelectedTestcases
 		
 			ac = WTAC.instance
@@ -108,48 +148,54 @@ module Webtest
 		def executeTestcaseWithAllContexts(singleTestcase, useTestcaseDirectoryPrefix)
 			
 			ac = WTAC.instance
-            allAvailableContexts = getAllTestcaseContexts(singleTestcase)
+			allAvailableContexts = getAllTestcaseContexts(singleTestcase)
                            
 			ac.log.info "allAvailableContexts = " + allAvailableContexts.to_s
-            if allAvailableContexts == nil
-                executeSingleTestcase(singleTestcase, useTestcaseDirectoryPrefix)
-            else
-                allAvailableContexts.each do |key,value| 
-                    
-                    Webtest::TestcaseContext.instance.reset
-                    Webtest::TestcaseContext.instance.name = key
-                    Webtest::TestcaseContext.instance.contextConfiguration = value
-                    
-                    executeSingleTestcase(singleTestcase, useTestcaseDirectoryPrefix)
-                end
-            end
+			if allAvailableContexts == nil
+				executeSingleTestcase(singleTestcase, useTestcaseDirectoryPrefix)
+			else
+				allAvailableContexts.each do |key,value| 
+			    
+					Webtest::TestcaseContext.instance.reset
+					Webtest::TestcaseContext.instance.name = key
+					Webtest::TestcaseContext.instance.contextConfiguration = value
+
+					executeSingleTestcase(singleTestcase, useTestcaseDirectoryPrefix)
+				end
+			end
             
 		end
-        
-        def executeSingleTestcase(singleTestcase, useTestcaseDirectoryPrefix)
-        			
-            testrunner = buildAndConfigureTestrunner(singleTestcase, useTestcaseDirectoryPrefix)
-            ac = WTAC.instance
-               
-            if(testrunner.valid?)
-                ac.log.info("Start execute test " + testrunner.to_s)
-                begin
-                    testrunner.run
-                rescue Exception => e
-                    ac.log.error("Abort TC Run: " + e.message)
-                    ac.log.error e.backtrace.join("\n")
-                end
-                ac.log.info("Finished execute test " + testrunner.to_s)
-            else
-                testcasesHome = ac.config.read("main:testcase-directory")
-                ac.log.warn("Selected testcase '" + singleTestcase + "' is invalid (testcasesHome = '" + testcasesHome + "').")
-            end
-
-        ensure
-            removeTestcaseLogger
-			logExecutionResult(testrunner)
-        end
 		
+		def executeSingleTestcase(singleTestcase, useTestcaseDirectoryPrefix)
+				
+			testrunner = buildAndConfigureTestrunner(singleTestcase, useTestcaseDirectoryPrefix)
+			ac = WTAC.instance
+
+			@testrunnerEventLogger.testrunner = testrunner
+
+			if(testrunner.valid?)
+				ac.log.info("Start execute test " + testrunner.to_s)
+				testExecutionEventDto = @testrunnerEventLogger.onTestExecutionBegins
+				begin
+					testrunner.run
+					@testrunnerEventLogger.onTestExecutionReturns testExecutionEventDto
+				rescue Exception => e
+					ac.log.error("Abort TC Run: " + e.message)
+					ac.log.error e.backtrace.join("\n")
+					@testrunnerEventLogger.onTestExecutionException testExecutionEventDto
+				end
+				ac.log.info("Finished execute test " + testrunner.to_s)
+			else
+				testcasesHome = ac.config.read("main:testcase-directory")
+				ac.log.warn("Selected testcase '" + singleTestcase + "' is invalid (testcasesHome = '" + testcasesHome + "').")
+				@testrunnerEventLogger.onTestExecutionInvalid
+			end
+
+		ensure
+			removeTestcaseLogger
+			logExecutionResult(testrunner)
+		end
+
 		def logExecutionResult(testrunner)
 			idc = SZ::IssueDefinitionContext.instance
 			if idc.issues.length > 0
@@ -161,77 +207,56 @@ module Webtest
 				WTAC.instance.log.info "Result " +  testrunner.to_s
 			end
 			
-            # TODO flush logfile
 			idc.reset		
 		end
+
+		def getAllTestcaseContexts(singleTestcase)
+			loader = Webtest::TestcaseContextLoader.new
+			loader.testcaseHomeDirectory = testcaseHomeDirectory(singleTestcase)
+			return loader.loadAvailableContexts()
+		end
         
-        def getAllTestcaseContexts(singleTestcase)
-            loader = Webtest::TestcaseContextLoader.new
-            loader.testcaseHomeDirectory = testcaseHomeDirectory(singleTestcase)
-            return loader.loadAvailableContexts()
-        end
-        
-        def buildAndConfigureTestrunner(singleTestcase, useTestcaseDirectoryPrefix)
-        	ac = WTAC.instance
-			logDir = ac.config.read("main:logdir")		
-            		
-			testrunner = Webtest::ContextAwareTestrunner.new			
+		def buildAndConfigureTestrunner(singleTestcase, useTestcaseDirectoryPrefix)
                         
-            if Pathname.new(singleTestcase).absolute?
-                testcaseLogDir = logDir + "/" + guessTestcaseDirectoryByAbsolutePath(singleTestcase)
-            else
-                # should work in most cases. I expect to work with absolute directories
-                testcaseLogDir = logDir + "/" + singleTestcase
-            end
-            
+			testcaseLogDir = Webtest::PathUtils::getTestcaseLogDirectory(singleTestcase)
+			
+			testrunner = Webtest::ContextAwareTestrunner.new
 			testrunner.logDir = testcaseLogDir
-			
-            if useTestcaseDirectoryPrefix
-                testcasesHome = ac.config.read("main:testcase-directory")
-                ac.log.debug "Using TC Home " + testcasesHome
-                singleTestcase = singleTestcase.gsub(/^#{testcasesHome}\/?/, "")
-            
-                testrunner.testcaseDir = testcasesHome + "/" + singleTestcase
-			
-            else
-                testrunner.testcaseDir = singleTestcase
-            end
-            
-            return testrunner
-        end
+
+			ac = WTAC.instance
+
+			if useTestcaseDirectoryPrefix
+				testcasesHome = ac.config.read("main:testcase-directory")
+				ac.log.debug "Using TC Home " + testcasesHome
+				singleTestcase = singleTestcase.gsub(/^#{testcasesHome}\/?/, "")
+
+				testrunner.testcaseDir = testcasesHome + "/" + singleTestcase
+
+			else
+				testrunner.testcaseDir = singleTestcase
+			end
+
+			return testrunner
+		end
         
-        def testcaseHomeDirectory(singleTestcase)
-			
+		def testcaseHomeDirectory(singleTestcase)
+				
 			WTAC.instance.log.info "singleTestcase = " + singleTestcase
-		
-            if Pathname.new(singleTestcase).absolute?
-                return singleTestcase
-            else
-                testcasesHome = WTAC.instance.config.read("main:testcase-directory")
-                return testcasesHome + "/" + singleTestcase
-            end
-        end
-        
-        def removeTestcaseLogger
-            log = WTAC.instance.log
-            log.sendToBoth = true
-            log.localLogger = nil
-        end
-        
-        def guessTestcaseDirectoryByAbsolutePath(absoluteTestcasePath)
-            
-            ac = WTAC.instance
-            testcaseHomeDirectory = testcasesHome = ac.config.read("main:testcase-directory")
-            
-            result = "tc"
-            
-            if absoluteTestcasePath =~ /^(#{testcaseHomeDirectory})\/?(.+)$/i
-                result = $2
-            end
-            
-            return result
-        end
-        
+			
+			if Pathname.new(singleTestcase).absolute?
+				return singleTestcase
+			else
+				testcasesHome = WTAC.instance.config.read("main:testcase-directory")
+				return testcasesHome + "/" + singleTestcase
+			end
+		end
+
+		def removeTestcaseLogger
+			log = WTAC.instance.log
+			log.sendToBoth = true
+			log.localLogger = nil
+		end
+			
 		def abortIfLogDirectoryNotClean
 		
 			logdir = @config.read("main:logdir")
@@ -239,8 +264,13 @@ module Webtest
 			
 			Dir.foreach(logdir) do |entry|
 				WTAC.instance.log.debug "abortIfLogDirectoryNotClean: directory scan, entry='" + entry + "'"
-                raise "Log directory is not clean" unless entry == Webtest::DEFAULT_RUN_LOGFILE or entry == '.' or entry == '..'
+				raise "Log directory is not clean" unless 
+					entry == Webtest::DEFAULT_RUN_LOGFILE or 
+					entry == Webtest::DEFAULT_RUN_LOGFILE + '.yml' or 
+					entry == '.' or 
+					entry == '..'
 			end
 		end
 	end
+
 end

@@ -9,3 +9,5 @@ spec/chromedriver.log
 bin-vendor
 spec/out.log
 .svn/
+.redcar/
+spec/core/webtest/testexecution_to_yaml_event_listener.out.yml

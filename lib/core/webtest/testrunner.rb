@@ -41,13 +41,14 @@ module Webtest
 		include Webtest
 		
 		attr_accessor :logDir
+		attr_reader   :executionResult
 		attr_accessor :testcaseDir		
 		
 		def self.validTestcase?(testcaseDir)
 		
 			# TODO may remove this later
 			log = WTAC.instance.log
-            log.debug "validTestcase?: testcaseDir set? " + (testcaseDir != nil).to_s
+			log.debug "validTestcase?: testcaseDir set? " + (testcaseDir != nil).to_s
 			log.debug "validTestcase?:  spec.rb exists? " + File.exists?(testcaseDir + "/spec.rb").to_s
 			log.debug "validTestcase?: spec.yml exists? " + File.exists?(testcaseDir + "/spec.yml").to_s
 		
@@ -67,8 +68,8 @@ module Webtest
 		end
 		
 		def run
-            doRun
-        end
+			doRun
+		end
 		
 		def testcaseName
 			return "<unknown-testcase>" if @testcaseDir == nil
@@ -82,7 +83,7 @@ module Webtest
 	
 		protected
 		
-        def doRun
+		def doRun
         	
 			WTAC.instance.log.info "FOO"
 			
@@ -100,7 +101,7 @@ module Webtest
 			@configureTestEngineAdvice.testcaseDir = @testcaseDir
 			@configureTestEngineAdvice.onBefore
 			
-            advice = ConfigureTestcaseLoggingAdvice.new
+			advice = ConfigureTestcaseLoggingAdvice.new
 			advice.logDir = @logDir
 			advice.onBefore
 			
@@ -182,7 +183,7 @@ module Webtest
 			ac = WTAC.instance
 		
 			Webtest::Files.closeAll()
-            Webtest::Files.flushAll()
+		        Webtest::Files.flushAll()
 
 			ac.config.loadLocal(nil)
 			ac.log.localLogger = nil
@@ -294,7 +295,6 @@ module Webtest
 				@executeTestcaseAdvice.testEngine = @testEngine
 				# scan for known issues and rerun each issue
 				Dir[@testcaseDir + '/spec*.rb'].each do |file|
-					
 					executeIssueFileSpec(file)
 				end
 			end

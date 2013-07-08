@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+
+<html>
+<body>
+	<h1>Testresults</h1>
+
+	<% for @item in @data %>
+	<div>
+		<h2><%= @item.name %></h2>
+		<p>
+			<a href="<%= @item.source %>">
+				Goto logfile
+			</a>
+		</p>
+	
+		<% for @event in @item.events %>
+		<div class="<%= @event.eventId %>">
+			<tr>
+				<td>ID:</td>
+				<td><%= @event.eventId %></td>
+			</tr>
+			<tr>
+				<td>RESULT:</td>
+				<td><%= @event.result %></td>
+			</tr>
+			<tr>
+				<td>TIMESTAMP:</td>
+				<td><%= @event.timestamp %></td>
+			</tr>
+		</div>
+		<% end %>
+	</div>
+	<% end %>
+
+</body>
+</html>
+
+
+
