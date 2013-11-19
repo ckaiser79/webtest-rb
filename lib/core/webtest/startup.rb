@@ -14,6 +14,8 @@ require 'webtest/testcase_context'
 require 'webtest/testcase_context_loader'
 require 'sz'
 
+#require 'zip'
+
 
 module Webtest
 
@@ -38,6 +40,40 @@ module Webtest
 			return logDir + "/" + result
 		end
 	end
+	
+	class HtmlReportGenerateService		
+			
+		def generate
+		
+			service = SZ::YamlToTemplateRenderService.instance
+			
+			logfileName = WTAC.instance.config.read('main:logfile')			
+			
+			yamlData = YAML::load_file(logfileName + '.yml')
+			templateFile = WTAC.instance.config.read('main:html_reports:template_summary')
+			destinationFile = logfileName + '.html'
+
+			bindingData = SZ::BindingContainer.new(yamlData['eventlog']).exposeBinding
+			service.renderAsFile(bindingData, templateFile, destinationFile)
+
+		end
+	end
+	
+	class ZipService
+	
+		include Singleton
+		
+		def zipDirectory source, target
+			source = source + '/' if not source.end_with? '/' or source.end_with? "\\"
+			Zip::File.open(target, Zip::File::CREATE) do |zipfile|
+				Dir[File.join(source, '**', '**')].each do |file|
+					#puts file.sub(source, '') + ' - ' + file
+					zipfile.add(file.sub(source, ''), file)
+				end
+			end
+		end
+		
+	end
 
 	class Startup
 
@@ -52,35 +88,58 @@ module Webtest
 		end
 		
 		def run
-		
+			
+			@lockfile = SZ::Lockfile.new @config.read('main:apphome') + '/webtest-running.lck'
+			@lockfile.lock
+			
 			configureLogging
-
+					
 			ac = WTAC.instance
 			ac.log.info("Started")
 
 			abortIfLogDirectoryNotClean
-			executeAllSelectedTestcases
-
-			generateHtmlReport
 			
-			ac.log.info("Stopped")
-			ac.close
+			begin
+				executeAllSelectedTestcases
+				
+				ac.log.info("Finished")
+			
+			rescue Interrupt
+				ac.log.info("Interrupted!")
+				
+			end
 
+			WTAC.instance.log.info("Generate HTML Report ")
+			HtmlReportGenerateService.new.generate
+			archiveResults
+			
+			ac.close
+		ensure 
+			@lockfile.unlock if @lockfile.exists?
 		end
 		
 		private
 		
-		def generateHtmlReport
-			service = SZ::YamlToTemplateRenderService.instance
+		def archiveResults
 			
-			logfileName = @config.read('main:logfile')
-			yamlData = YAML::load_file(logfileName + '.yml')
-			templateFile = @config.read('main:html_reports:template_summary')
-			destinationFile = logfileName + '.html'
-
-			bindingData = SZ::BindingContainer.new(yamlData['eventlog']).exposeBinding
-			service.renderAsFile(bindingData, templateFile, destinationFile)
-
+			if archiveEnabled?
+				ac = WTAC.instance
+				zipService = ZipService.instance
+				
+				destFilename = @config.read('main:archive:dir') + '/log.' + Time.now.strftime('%Y%m%d-%H%M%S')
+				name = @config.read('main:archive:name')
+				if name.length > 0
+					destFilename = destFilename + '.' + name
+				end
+				destFilename = destFilename + '.zip'
+				
+				zipService.zipDirectory @config.read('main:logdir'), destFilename
+			end
+					
+		end
+		
+		def archiveEnabled?			
+			return @config.read('main:archive:enabled')		
 		end
 
 		def configureLogging

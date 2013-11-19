@@ -3,34 +3,35 @@
 <html>
 <head>
 
-	<link href="../conf/css/bootstrap.css" rel="stylesheet">
-	<style>
-body {
-	padding-top: 60px; /* 60px to make the container go all the way to the bottom of the topbar */
-	padding-left: 120px;
-}
+	<link href="../../conf/reports/css/bootstrap.css" rel="stylesheet">
 
-.events td { padding-left: 15px; }
-thead td { font-weight: bold; }
-
-tr.testexecution_begins td { border-top: 1px black solid; }
-
-.success { background-color: green; }
-.fail { background-color: red; }
-.error { background-color: red; }
-
-	</style>
-<body>
+<body class="container">
+	<div class="navbar">
+		<div class="navbar-inner">
+			<a class="brand" href="#">Filter</a>
+			<ul class="nav">
+				<li><a href="#" id="toggle-in">Incoming</a></li>
+				<li><a href="#" id="toggle-out">Outgoing</a></li>
+				<li><a href="#" id="toggle-exclamation">Attention</a></li>
+				<li><a href="#" id="toggle-unknown">Unknown</a></li>
+				<li><a href="#" id="toggle-fail">Fail</a></li>
+				<li><a href="#" id="toggle-error">Error</a></li>
+				<li><a href="#" id="toggle-issue">Issue</a></li>
+				<li><a href="#" id="toggle-success">Success</a></li>
+			</ul>
+		</div>
+	</div>
 	<h1>Testresults</h1>
 
-	<table>
+	<table class="table table-striped table-hover">
 	<thead>
 		<tr>
-			<td>EVENT</td>
-			<td>Timestamp</td>
-			<td>TESTCASE</td>
-			<td>CONTEXT</td>
-			<td>RESULT</td>
+			<th>&nbsp;</th>
+			<th>EVENT</th>
+			<th>Timestamp</th>
+			<th>TESTCASE</th>
+			<th>CONTEXT</th>
+			<th>RESULT</th>
 		</tr>
 	</thead>
 	<tbody>	
@@ -38,6 +39,7 @@ tr.testexecution_begins td { border-top: 1px black solid; }
 		<% for @event in @item.events %>
 
 		<tr class="<%= @event.result %> <%= @event.eventId %>">
+			<td><input type="checkbox" class="reviewed"></td>
 			<td class="eventId">
 			<% if @event.eventId.to_s == 'testexecution_begins' %>
 			&gt;&gt;
@@ -46,6 +48,7 @@ tr.testexecution_begins td { border-top: 1px black solid; }
 			<% else %>
 			!!
 			<% end %>
+			
 			</td>
 			<td><%= @event.timestamp.strftime('%Y-%m-%d %H:%M:%S') %></td>
 			<td>
@@ -73,7 +76,11 @@ tr.testexecution_begins td { border-top: 1px black solid; }
 	<% end %>
 	</tbody>
 	</table>
-
+	
+	<script src="../../conf/reports/js/jquery-1.10.2.min.js"></script>
+    <script src="../../conf/reports/js/bootstrap.min.js"></script>
+	<script src="../../conf/reports/js/script.js"></script>
+	
 </body>
 </html>
 

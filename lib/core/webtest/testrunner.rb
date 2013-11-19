@@ -84,15 +84,11 @@ module Webtest
 		protected
 		
 		def doRun
-        	
-			WTAC.instance.log.info "FOO"
-			
+        				
 			advice = AssertValidDirectoriesAndCreateThemAdvice.new
 			advice.testcaseDir = @testcaseDir
 			advice.logDir = @logDir
 			advice.onBefore
-			
-			WTAC.instance.log.info "BAR"
 			
 			advice = LoadTestcaseSpecificConfigurationAdvice.new
 			advice.testcaseDir = @testcaseDir
@@ -100,9 +96,12 @@ module Webtest
             
 			@configureTestEngineAdvice.testcaseDir = @testcaseDir
 			@configureTestEngineAdvice.onBefore
-			
+						
 			advice = ConfigureTestcaseLoggingAdvice.new
 			advice.logDir = @logDir
+			advice.onBefore
+			
+			advice = ConfigureBrowserSupportAdvice.new
 			advice.onBefore
 			
 			rspecLogfilesOpenAndCloseAdvice = RspecLogfilesOpenAndCloseAdvice.new
@@ -290,7 +289,7 @@ module Webtest
 		
 		def onReturn
 			
-			if @executionResult == "FAIL"
+			if @executionResult == "FAIL" #|| @executionResult =="ERROR"
 			
 				@executeTestcaseAdvice.testEngine = @testEngine
 				# scan for known issues and rerun each issue
@@ -318,13 +317,14 @@ module Webtest
 			
 				@testEngine.testcaseSpec = file
 				
-				@executeTestcaseAdvice.out = @rspecLogfilesOpenAndCloseAdvice.out
-				@executeTestcaseAdvice.err = @rspecLogfilesOpenAndCloseAdvice.err
+				@executeTestcaseAdvice.out = rspecLogfilesOpenAndCloseAdvice.out
+				@executeTestcaseAdvice.err = rspecLogfilesOpenAndCloseAdvice.err
 				@executeTestcaseAdvice.suffix = issue.to_s
 				@executeTestcaseAdvice.onInvoke
 				
 				rspecLogfilesOpenAndCloseAdvice.onReturn
 				
+				#binding.pry
 				rc = @executeTestcaseAdvice.rc
 				issue.markDetected if(rc == 0)
 				
@@ -345,6 +345,7 @@ module Webtest
 		
 		attr_writer :out
 		attr_writer :err
+		attr_reader :rc
 		
 		attr_reader :executionResult
 	
@@ -358,6 +359,7 @@ module Webtest
 			ac = WTAC.instance
 			
 			rc = RC_TESTENGINE_THROWS_EXCEPTION
+			@rc = rc
 			
 			begin
 				rc = @testEngine.runTest(@out,@err)
@@ -384,10 +386,29 @@ module Webtest
 			else
 				@executionResult = "SUCCESS"
 			end
+			
+			@rc = rc
 		end
 		
 	end
 
+	class ConfigureBrowserSupportAdvice
+	
+		def onBefore
+			config = WTAC.instance.config
+			
+			selectedBrowserType = config.read('browser-tests:browser-type')
+			
+			sizeX = config.read('browser-tests:x-size').to_i
+			sizeY = config.read('browser-tests:y-size').to_i
+			
+			service = BrowserInstanceService.instance
+			service.selectedBrowserType = selectedBrowserType
+			service.sizeX = sizeX
+			service.sizeY = sizeY
+		end
+	end
+	
 	class LoadTestcaseSpecificConfigurationAdvice
 	
 		attr_writer :testcaseDir

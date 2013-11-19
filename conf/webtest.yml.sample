@@ -4,6 +4,11 @@ main:
   verbose: false
   apphome: ../../ # you need to modify this
   logdir: ${main:apphome}/log/last_run
+  archive:
+    dir: ${machine-specific:apphome}/archive
+    enabled: true
+  html_reports:
+    template_summary: ${machine-specific:apphome}/conf/reports/summary.template.html  
   testcase-directory: ${main:apphome}/testcases
   
 browser-tests:
@@ -22,3 +27,6 @@ data:
     
 i18n:
 
+rest-client:
+  #proxy-url: none
+  proxy-url: http://anything:8080

@@ -58,11 +58,19 @@ module Webtest
 		end
 
 	end
-
+	
 	class BrowserWithBaseUrl
 		include Decorator
 		
 		attr_accessor :baseUrl
+		
+		def goto(url)
+			if url.index('://')!= nil
+				return super(url)
+			else
+				return super(@baseUrl + url)
+			end
+		end
 		
 	end
 	

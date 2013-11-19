@@ -17,6 +17,7 @@ require 'webtest/browser_factory'
 require 'webtest/logfile_result_printing_service'
 
 require 'webtest/testcase_locator_service'
+require 'webtest/rest-client'
 
 
 

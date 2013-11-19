@@ -18,7 +18,7 @@ module Webtest
 		attr_writer :sizeY
 		
 		def initialize
-			@selectedBrowserType = 'ff'
+			@selectedBrowserType = 'firefox'
 			
 			@sizeX = 1200
 			@sizeY = 800
@@ -86,7 +86,16 @@ module Webtest
 		def createNewConfiguredBrowserInstance
 			config = WTAC.instance.config
 			
-			browser = Watir::Browser.new @selectedBrowserType
+			# temporarily proxy workaround
+			# @autor: bassmaja
+			# @date: 11.11.2013
+			
+			if @selectedBrowserType = 'firefox'
+				browser = Watir::Browser.new @selectedBrowserType, :profile => 'webtest'
+			else
+				browser = Watir::Browser.new @selectedBrowserType
+			end
+			
 			
 			browser.window.move_to(0,0)
 			browser.window.resize_to(@sizeX, @sizeY)

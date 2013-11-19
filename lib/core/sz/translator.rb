@@ -15,7 +15,7 @@ module SZ
 	class Translator
 	
 		def initialize(prefix, messageSource)
-			@prefix = prefix
+			@prefix = prefix.to_s
 			@messageSource = messageSource
 		end
 

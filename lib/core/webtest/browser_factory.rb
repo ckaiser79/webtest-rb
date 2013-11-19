@@ -11,11 +11,14 @@ module Webtest
 
 		include Webtest
 	
+		@@openBrowsers = Array.new
+		
 		attr_reader :selectedBrowserType
 		attr_writer :autocloseBrowser
 		attr_writer :reuseBrowser
 	
 		def self.closeAllBrowsers()
+			
 			@@openBrowsers.each do |browser| 
 				if(browser != nil)
 					browser.close
@@ -48,9 +51,8 @@ module Webtest
 	
 		def newBrowser(mayReuse = true)
 		
-		
-			if(mayReuse && @reuseBrowser)
-				if(@lastBrowserInstance == nil)
+			if mayReuse || @reuseBrowser
+				if @lastBrowserInstance == nil
 					@lastBrowserInstance = createNewSelfDestructingBrowser
 				end
 			else

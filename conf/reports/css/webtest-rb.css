@@ -1,0 +1,13 @@
+body {
+	padding-top: 60px; /* 60px to make the container go all the way to the bottom of the topbar */
+	padding-left: 120px;
+}
+
+.events td { padding-left: 15px; }
+thead td { font-weight: bold; }
+
+tr.testexecution_begins td { border-top: 1px black solid; }
+
+.success { background-color: green; }
+.fail { background-color: red; }
+.error { background-color: red; }

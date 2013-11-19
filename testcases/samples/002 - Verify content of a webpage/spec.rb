@@ -5,7 +5,7 @@ require 'webtest'
 describe "Walk heise.de page" do
 
   before :all do
-	@browser = Webtest::BrowserFactory.new.newBrowser
+	@browser = Webtest::BrowserInstanceService.instance.sharedBrowser
 	@browser.dumpOnInspection = false # do not save screenshots automatically
   end
 
@@ -23,7 +23,7 @@ describe "Walk heise.de page" do
 
     source = @browser.html
     
-    source.should include '<a class="channel_titel" title="heise online News" href="/">News</a>'
+    source.should include 'heise online News'
 	
   end
 

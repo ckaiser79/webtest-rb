@@ -96,12 +96,16 @@ module Webtest
 
         
 		def saveGlobalValue(path, value)
-
+			
+			#ensure included hashes exists
+			readOptional path
+			
 			hash = @globalConfig
 			lastHash = nil
 			lastKey = nil
 
 			for item in path.split(":") do
+			
 				lastKey = item
 				lastHash = hash
 
@@ -109,10 +113,10 @@ module Webtest
                 #puts "lastHash=" + lastHash.to_s
                 #puts 
                 
-				hash = hash[item]
-				if(hash == nil) 
+				hash = hash[lastKey]
+				if(hash == nil) 				
 					new_hash = {}
-					lastHash[item] = new_hash
+					lastHash[lastKey] = new_hash
 					hash = new_hash
 				end
 			end

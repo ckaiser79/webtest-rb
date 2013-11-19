@@ -38,8 +38,8 @@ def readCommandlineArguments
 		end
 		
 		options[:browser] = nil
-		opts.on( '-b', '--browser <ie|firefox|chrome>', 'Run testcase using this browser' ) do|file|
-			options[:browser] = file
+		opts.on( '-b', '--browser <ie|firefox|chrome>', 'Run testcase using this browser' ) do |type|
+			options[:browser] = type
 		end		
 		
 		options[:run_all] = false
@@ -56,6 +56,16 @@ def readCommandlineArguments
 		opts.on( '-p', '--print-summary', 'Print a summary of all results based on last created logfile.' ) do
 			options[:print_summary] = true
 		end	
+		
+		options[:force]
+		opts.on( '-f', '--force', 'If lock file exists, remove it, and create a new one (currently ignored).' ) do
+			options[:force] = true
+		end			
+		
+		options[:name] = nil
+		opts.on( '-n', '--name NAME', 'You can give this run a name, that is used as an identifier in archived files.' ) do |name|
+			options[:name] = name
+		end		
 	 
 		# This displays the help screen, all programs are
 		# assumed to have this option.
@@ -90,6 +100,7 @@ if options[:config] == nil
 	options[:config] = '../conf/webtest.yml'
 end
 
+
 initConfiguration options[:config]
 config = WTAC.instance.config
 
@@ -111,12 +122,23 @@ else
 end
 
 config.saveGlobalValue("main:verbose", options[:verbose].to_s)
+config.saveGlobalValue("main:archive:name", options[:name].to_s)
+
+#if options[:force] == true
+#	removeLockfile
+#end
 
 if options[:remove_logs]
 	logDir = config.read('main:logdir')
-	puts "Remove logdir " + logDir if config.read('main:verbose')
+	puts "Remove logdir\t" + logDir if config.read('main:verbose')
 	FileUtils.rm_rf(logDir)
-	puts "Done" + logDir if config.read('main:verbose')
+	FileUtils.rm_rf(logDir)
+	if Dir[logDir].empty?
+		puts "Done\t\t" + logDir if config.read('main:verbose')
+	else
+		puts "Fail, files in directory are in use."
+	end
+	
 end
 
 if options[:run_all] || options[:testcase] != nil
@@ -125,6 +147,8 @@ if options[:run_all] || options[:testcase] != nil
 end
 
 if options[:print_summary]
+	
+	Webtest::HtmlReportGenerateService.new.generate
 	
 	fileName = config.read('main:logfile')
 	service = Webtest::LogfileResultPrintingService.instance
