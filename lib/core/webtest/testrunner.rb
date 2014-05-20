@@ -148,7 +148,8 @@ module Webtest
             end
             
             super
-
+			
+			TestcaseContext.instance.reset
         end
         
 		def to_s

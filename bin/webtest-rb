@@ -58,7 +58,7 @@ def readCommandlineArguments
 		end	
 		
 		options[:force]
-		opts.on( '-f', '--force', 'If lock file exists, remove it, and create a new one (currently ignored).' ) do
+		opts.on( '-f', '--force', 'If lock file exists, remove it, and create a new one.' ) do
 			options[:force] = true
 		end			
 		
@@ -124,9 +124,11 @@ end
 config.saveGlobalValue("main:verbose", options[:verbose].to_s)
 config.saveGlobalValue("main:archive:name", options[:name].to_s)
 
-#if options[:force] == true
-#	removeLockfile
-#end
+if options[:force] == true
+	config.saveGlobalValue("main:force-remove-lockfile", true)
+else
+	config.saveGlobalValue("main:force-remove-lockfile", false)
+end
 
 if options[:remove_logs]
 	logDir = config.read('main:logdir')

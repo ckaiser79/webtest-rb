@@ -27,6 +27,15 @@ module SZ
 			return @lockDone && File.exists?(@fileName)
 		end
 		
+		def fileExists?
+			return File.exists?(@fileName)
+		end
+		
+		def forceUnlock
+			File.delete(@fileName)
+			@lockDone = false
+		end
+		
 		def unlock	
 			if not @lockDone
 				raise "Try to raise foreign lockfile " + dump 

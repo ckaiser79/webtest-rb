@@ -89,8 +89,7 @@ module Webtest
 		
 		def run
 			
-			@lockfile = SZ::Lockfile.new @config.read('main:apphome') + '/webtest-running.lck'
-			@lockfile.lock
+			assertCorrectLockfile
 			
 			configureLogging
 					
@@ -98,6 +97,8 @@ module Webtest
 			ac.log.info("Started")
 
 			abortIfLogDirectoryNotClean
+			
+			ac.log.info "Run name: " + @config.read('main:archive:name').to_s
 			
 			begin
 				executeAllSelectedTestcases
@@ -119,6 +120,16 @@ module Webtest
 		end
 		
 		private
+		
+		def assertCorrectLockfile
+			@lockfile = SZ::Lockfile.new @config.read('main:apphome') + '/webtest-running.lck'
+			
+			if(@config.read('main:force-remove-lockfile') && @lockfile.fileExists?)
+				@lockfile.forceUnlock
+			end
+			
+			@lockfile.lock
+		end
 		
 		def archiveResults
 			

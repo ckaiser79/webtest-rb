@@ -40,5 +40,6 @@ module SZ
 		def tr(key)
 			return @translator.key(key)
 		end
+		
 	end
 end

@@ -90,7 +90,7 @@ module Webtest
 			# @autor: bassmaja
 			# @date: 11.11.2013
 			
-			if @selectedBrowserType = 'firefox'
+			if @selectedBrowserType == 'firefox'
 				browser = Watir::Browser.new @selectedBrowserType, :profile => 'webtest'
 			else
 				browser = Watir::Browser.new @selectedBrowserType
