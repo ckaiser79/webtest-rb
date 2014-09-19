@@ -1,7 +1,7 @@
 require 'webtest'
 require 'pry'
 
-describe Webtest::BrowserFactory, "#reuse browsers" do
+describe Webtest::BrowserInstanceService, "#reuse browsers" do
 
 	before :each do
 		config = Webtest::Configuration.new

@@ -15,8 +15,8 @@ browser-tests:
 
 		WTAC.instance.config = config
 		
-		factory = Webtest::BrowserFactory.new
-		browser = factory.newBrowser
+		service = Webtest::BrowserInstanceService.instance
+		browser = service.ownBrowser
 		
 		@decoratedBrowser = BrowserLoggingDecorator.new(browser)
 		@decoratedBrowser.logDir '../../log'
