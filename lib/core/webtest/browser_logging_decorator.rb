@@ -74,6 +74,27 @@ module Webtest
 		
 	end
 	
+	class WaitingBrowserDecorator
+	
+		include Decorator	
+		
+		def initialize(decorated)
+			@decorated = decorated
+		end
+		
+		def waitFor(spec, defaultTimeout = 5)
+			i = 0
+			until browser.element(spec).exists? do 
+				if i > defaultTimeout 
+					raise 'Element ' + spec.to_s + ' is not available after ' + defaultTimeout.to_s + ' sec.'
+				end
+				sleep 1
+				i = i + 1
+			end
+		end
+	
+	end
+	
 	class BrowserWithDumper
 	
 		include Decorator
@@ -92,7 +113,7 @@ module Webtest
 			
 			@filenameGenerateService = SZ::NumericPrefixGenerateService.instance
 			
-			@dumpOnInspection = true
+			@dumpOnInspection = false
 		end	
 
 		def dump(name = nil)

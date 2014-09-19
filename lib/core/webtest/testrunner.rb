@@ -26,7 +26,7 @@ module Webtest
 			
 			args = [
 				"--format",
-				"nested",
+				"documentation",
 				@testcaseSpec
 			]
             

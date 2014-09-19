@@ -102,8 +102,12 @@ module Webtest
 			
 			decoratedBrowser = BrowserWithDumper.new(browser)
 			decoratedBrowser = BrowserWithCacheAccess.new(decoratedBrowser)
-			decoratedBrowser = BrowserWithBaseUrl.new(decoratedBrowser)
+			decoratedBrowser = WaitingBrowserDecorator.new(decoratedBrowser)
 			
+			decoratedBrowser = BrowserWithBaseUrl.new(decoratedBrowser)			
+			baseUrl = config.readOptional('browser-tests:baseUrl')
+			decoratedBrowser.baseUrl = baseUrl
+						
 			proxy = LoggingProxy.new(decoratedBrowser)
 			proxy.log = WTAC.instance.log
 			proxy.excludes = [
