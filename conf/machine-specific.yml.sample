@@ -1,2 +1,3 @@
 ---
+# the path where webtest is installed in. Use slashes.
 apphome: C:/dev/projects/webtest-rb
