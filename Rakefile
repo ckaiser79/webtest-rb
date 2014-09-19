@@ -1,6 +1,7 @@
 
 require 'fileutils'
 require 'rake/packagetask'
+require 'rdoc/task'
 
 NAME='webtest-rb'
 VERSION='0.0-SNAPSHOT'
@@ -29,6 +30,13 @@ task :install do
 	FileUtils.mkdir('lib/vendor')
 	FileUtils.mkdir('spec/vendor')
 	FileUtils.mkdir('bin-vendor')
+end
+
+RDoc::Task.new do |rdoc|
+	rdoc.main = 'README.rdoc'
+	rdoc.rdoc_dir = 'generated/api-doc'
+	rdoc.rdoc_files.include('README.rdoc', 'lib/**/*.rb')
+	rdoc.options << '--visibility=public'
 end
 	
 Rake::PackageTask.new(NAME, VERSION) do |p|
