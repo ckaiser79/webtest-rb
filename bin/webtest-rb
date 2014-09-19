@@ -66,6 +66,11 @@ def readCommandlineArguments
 		opts.on( '-n', '--name NAME', 'You can give this run a name, that is used as an identifier in archived files.' ) do |name|
 			options[:name] = name
 		end		
+		
+		options[:archive_enabled] = false
+		opts.on( '-a', '--archive', 'Overwrite setting main:archive:enabled with true value.' ) do |name|
+			options[:name] = true
+		end				
 	 
 		# This displays the help screen, all programs are
 		# assumed to have this option.
