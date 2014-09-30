@@ -13,7 +13,6 @@ require 'webtest/testrunner_event_listener'
 #order is important here
 require 'webtest/browser_logging_decorator'
 require 'webtest/browser_instance_service'
-require 'webtest/browser_factory'
 require 'webtest/logfile_result_printing_service'
 
 require 'webtest/testcase_locator_service'
