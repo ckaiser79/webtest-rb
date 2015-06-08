@@ -1,7 +1,9 @@
- 
- == USAGE ==
 
- You can call the main exe like this:
+_Documentation is currently in work!_
+ 
+== USAGE ==
+
+You can call the main exe like this:
 
     C:\dev\projects\webtest-rb\bin>ruby webtest-rb -h
     Usage: run_testcases [options]
