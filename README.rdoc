@@ -1,7 +1,13 @@
 
+= WEBTEST-RB
+
+Is a program to run automated browser end to end tests and present a 
+report including detailed informations and screenshots. It is based on 
+the selenium api. Tests are coded as rspec files.
+
 _Documentation is currently in work!_
  
-== USAGE ==
+== USAGE 
 
 You can call the main exe like this:
 
