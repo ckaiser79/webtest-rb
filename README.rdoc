@@ -1,23 +1,23 @@
-# 
-# == USAGE ==
-#
-# You can call the main exe like this:
-#
-#    C:\dev\projects\webtest-rb\bin>ruby webtest-rb -h
-#    Usage: run_testcases [options]
-#        -v, --verbose                    Output more information
-#        -l, --logfile FILE               Write log to FILE
-#            --config FILE                Load this configuration
-#        -t, --testcase FILE              Load single testcase
-#        -b <ie|firefox|chrome>,          Run testcase using this browser
-#            --browser
-#        -r, --run-all                    Run all selected testcases
-#        -c, --remove-logs                Remove logdirectory before running tests
-#        -p, --print-summary              Print a summary of all results based on last created logfile.
-#        -f, --force                      If lock file exists, remove it, and create a new one.
-#        -n, --name NAME                  You can give this run a name, that is used as an identifier in archived files.
-#        -a, --archive                    Overwrite setting main:archive:enabled with true value.
-#        -h, --help                       Display this screen
-#    
-#    C:\dev\projects\webtest-rb\bin>
-#
+ 
+ == USAGE ==
+
+ You can call the main exe like this:
+
+    C:\dev\projects\webtest-rb\bin>ruby webtest-rb -h
+    Usage: run_testcases [options]
+        -v, --verbose                    Output more information
+        -l, --logfile FILE               Write log to FILE
+            --config FILE                Load this configuration
+        -t, --testcase FILE              Load single testcase
+        -b <ie|firefox|chrome>,          Run testcase using this browser
+            --browser
+        -r, --run-all                    Run all selected testcases
+        -c, --remove-logs                Remove logdirectory before running tests
+        -p, --print-summary              Print a summary of all results based on last created logfile.
+        -f, --force                      If lock file exists, remove it, and create a new one.
+        -n, --name NAME                  You can give this run a name, that is used as an identifier in archived files.
+        -a, --archive                    Overwrite setting main:archive:enabled with true value.
+        -h, --help                       Display this screen
+    
+    C:\dev\projects\webtest-rb\bin>
+
