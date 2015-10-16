@@ -4,7 +4,9 @@ require 'webtest/files'
 require 'fileutils'
 
 require 'rspec'
+require 'rspec/core/formatters/json_formatter'
 require 'rspec/core/runner'
+
 require 'wtac'
 require 'sz/issue_definition_context'
 require 'pry'
@@ -14,25 +16,36 @@ module Webtest
 	class RspecTestEngine
 		
 		attr_writer :testcaseSpec
-		
-		def initialize
-			@fileName = "/spec.rb"
-		end
-		
+		attr_writer :logDir
+
 		def runTest(out, err)
-		
-			RSpec::configuration.error_stream = nil
-			RSpec::configuration.output_stream = nil
-			
-			args = [
-				"--format",
-				"documentation",
-				@testcaseSpec
-			]
-            
-            WTAC.instance.log.debug "run rspec " + args.to_s
-			return RSpec::Core::Runner.run(args, out, err)
-		
+
+			htmlFile = File.open(@logDir + '/rspec.html', 'w')
+
+			config = RSpec.configuration
+
+			formatter = RSpec::Core::Formatters::HtmlFormatter.new(htmlFile)
+
+			# create reporter with html formatter
+			reporter =  RSpec::Core::Reporter.new(config)
+			config.instance_variable_set(:@reporter, reporter)
+
+			# internal hack
+			# api may not be stable, make sure lock down Rspec version
+			loader = config.send(:formatter_loader)
+			notifications = loader.send(:notifications_for, RSpec::Core::Formatters::HtmlFormatter)
+
+			reporter.register_listener(formatter, *notifications)
+
+			begin
+				result = RSpec::Core::Runner.run([@testcaseSpec])
+			ensure
+				RSpec.clear_examples
+			end
+
+			return result
+		ensure
+			htmlFile.close unless htmlFile.nil?
 		end
 	end
 
@@ -95,6 +108,7 @@ module Webtest
 			advice.onBefore
             
 			@configureTestEngineAdvice.testcaseDir = @testcaseDir
+			@configureTestEngineAdvice.logDir = @logDir
 			@configureTestEngineAdvice.onBefore
 						
 			advice = ConfigureTestcaseLoggingAdvice.new
@@ -110,6 +124,7 @@ module Webtest
 						
 			advice = ExecuteTestcaseAdvice.new
 			advice.testEngine = @configureTestEngineAdvice.testEngine
+			advice.logDir = @logDir
 			advice.out = rspecLogfilesOpenAndCloseAdvice.out
 			advice.err = rspecLogfilesOpenAndCloseAdvice.err
 			advice.onInvoke			
@@ -293,6 +308,8 @@ module Webtest
 			if @executionResult == "FAIL" #|| @executionResult =="ERROR"
 			
 				@executeTestcaseAdvice.testEngine = @testEngine
+				@executeTestcaseAdvice.logDir = @logDir
+
 				# scan for known issues and rerun each issue
 				Dir[@testcaseDir + '/spec*.rb'].each do |file|
 					executeIssueFileSpec(file)
@@ -343,6 +360,7 @@ module Webtest
 	
 		attr_writer :suffix
 		attr_writer :testEngine
+		attr_writer :logDir
 		
 		attr_writer :out
 		attr_writer :err
@@ -372,7 +390,10 @@ module Webtest
 			end
 			
 			setTestcaseResult(rc)
-	
+
+			# create an empty file named by result
+			File.open(@logDir + '/'+ @executionResult, "w") {}
+
 			if true?(ac.config.read('browser-tests:autocloseBrowser'))
 				BrowserInstanceService.instance.closeOwnBrowsers
 			end
@@ -476,6 +497,7 @@ module Webtest
 	
 		attr_reader :testEngine
 		attr_writer :testcaseDir
+		attr_writer :logDir
 	
 		def initialize
 			@testEngine = Webtest::RspecTestEngine.new
@@ -483,6 +505,7 @@ module Webtest
 	
 		def onBefore			
 			@testEngine.testcaseSpec = @testcaseDir + '/spec.rb'
+			@testEngine.logDir = @logDir
 		end
 	end
 	

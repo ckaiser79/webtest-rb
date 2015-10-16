@@ -14,7 +14,7 @@ require 'webtest/testcase_context'
 require 'webtest/testcase_context_loader'
 require 'sz'
 
-#require 'zip'
+require 'launchy'
 
 
 module Webtest
@@ -55,6 +55,9 @@ module Webtest
 
 			bindingData = SZ::BindingContainer.new(yamlData['eventlog']).exposeBinding
 			service.renderAsFile(bindingData, templateFile, destinationFile)
+			
+			openReport = WTAC.instance.config.read('main:html_reports:auto-open')
+			Launchy.open(destinationFile) if openReport
 
 		end
 	end

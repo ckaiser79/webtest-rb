@@ -1,14 +1,19 @@
 
 ---
+
+# you need to modify this file
+machine-specific: $(include:../conf/machine-specific.yml)
+
 main:
   verbose: false
-  apphome: ../../ # you need to modify this
+  apphome: ${machine-specific:apphome} 
   logdir: ${main:apphome}/log/last_run
   archive:
     dir: ${machine-specific:apphome}/archive
     enabled: true
   html_reports:
     template_summary: ${machine-specific:apphome}/conf/reports/summary.template.html  
+    auto-open: true
   testcase-directory: ${main:apphome}/testcases
   
 browser-tests:
