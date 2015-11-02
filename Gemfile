@@ -13,3 +13,4 @@ gem 'rspec-mocks', '3.2.1'
 gem 'rspec-support', '3.2.2'
 gem 'watir-webdriver'
 gem 'launchy'
+gem 'ripl' # for interactive testing
