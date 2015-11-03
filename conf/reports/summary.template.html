@@ -22,7 +22,49 @@
 		</div>
 	</div>
 	<h1>Testresults</h1>
+	
 
+	<% 
+	
+	failures = 0
+	succeeds = 0
+	totals = 0
+	
+	for @item in @data 
+	  for @event in @item.events 
+			if @event.eventId.to_s == 'testexecution_begins'
+				totals = totals + 1
+			end
+			
+			if @event.result.to_s == 'success'
+				succeeds = succeeds + 1
+			elsif @event.result.to_s == 'fail'
+				failures = failures + 1
+			end 
+		 end 
+	 end 
+	%>
+	
+	<div class="summary">
+		<table class="table table-striped table-hover">
+			<thead>
+				<tr>
+					<th>totals</th>
+					<th class="success">succeeds</th>
+					<th class="fail">failures</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr>
+					<td><%= totals %></td>
+					<td class="success"><%= succeeds %></td>
+					<td class="fail"><%= failures %></td>
+				</tr>
+			<tbody>
+		</table>	
+	</div>
+		
+	
 	<table class="table table-striped table-hover">
 	<thead>
 		<tr>
@@ -76,7 +118,7 @@
 	<% end %>
 	</tbody>
 	</table>
-	
+
 	<script src="../../conf/reports/js/jquery-1.10.2.min.js"></script>
     <script src="../../conf/reports/js/bootstrap.min.js"></script>
 	<script src="../../conf/reports/js/script.js"></script>
