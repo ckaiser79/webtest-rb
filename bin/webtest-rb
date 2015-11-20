@@ -10,7 +10,9 @@ require 'webtest/startup'
 def readCommandlineArguments
 
 	options = {}
-	 
+		 
+	ARGV << "-h" if ARGV.empty?
+		 
 	optparse = OptionParser.new do|opts|
 		# Set a banner, displayed at the top
 		# of the help screen.
