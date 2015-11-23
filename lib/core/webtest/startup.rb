@@ -50,15 +50,29 @@ module Webtest
 			logfileName = WTAC.instance.config.read('main:logfile')			
 			
 			yamlData = YAML::load_file(logfileName + '.yml')
-			templateFile = WTAC.instance.config.read('main:html_reports:template_summary')
+			
+			
+			templateFile = WTAC.instance.config.read('main:html-reports:template-summary')
 			destinationFile = logfileName + '.html'
 
 			bindingData = SZ::BindingContainer.new(yamlData['eventlog']).exposeBinding
+			
+			
 			service.renderAsFile(bindingData, templateFile, destinationFile)
 			
-			openReport = WTAC.instance.config.read('main:html_reports:auto-open')
+			copyResourcesToLogDir
+			
+			openReport = WTAC.instance.config.read('main:html-reports:auto-open')
 			Launchy.open(destinationFile) if openReport
 
+		end
+		
+		private 
+		
+		def copyResourcesToLogDir
+			logdir = WTAC.instance.config.read('main:logdir')
+			srcdir = WTAC.instance.config.read('main:html-reports:resource-dir')
+			FileUtils.cp_r srcdir, logdir
 		end
 	end
 	

@@ -3,7 +3,7 @@
 <html>
 <head>
 
-	<link href="../../conf/reports/css/bootstrap.css" rel="stylesheet">
+	<link href="reports/css/bootstrap.css" rel="stylesheet">
 
 <body class="container">
 	<div class="navbar">
@@ -94,15 +94,22 @@
 			</td>
 			<td><%= @event.timestamp.strftime('%Y-%m-%d %H:%M:%S') %></td>
 			<td>
-				<a href="<%= @item.source %>" target="logs">
+				<% path = @item.source.gsub /.+\/last_run\//, '' %>
+	
+				<% if @item.context != 'unknown-context' %>
+				<a href="<%= path %>/<%= @item.context %>/" target="logs">
+				<% else %>			
+				<a href="<%= path %>" target="logs">
+				<% end %>
 				<%= @item.name %> 				
 				</a>, 	
+				
 				<% if @item.context != 'unknown-context' %>
-				<a href="<%= @item.source %>/<%= @item.context %>/rspec-stderr.txt" target="logs">
+				<a href="<%= path %>/<%= @item.context %>/rspec.html" target="logs">
 				<% else %>			
-				<a href="<%= @item.source %>/rspec-stderr.txt" target="logs">
+				<a href="<%= path %>/rspec.html" target="logs">
 				<% end %>
-				rspec-stderr.txt
+				<span class="<%= @event.result %>">Details</span>
 				</a>
 			</td>
 			<td class="context">
@@ -111,7 +118,8 @@
 				<% end %>
 			</td>
 			
-			<td class="result"><%= @event.result %></td>
+			<td class="result">
+			<%= @event.result %></td>
 		</tr>
 
 		<% end %>
@@ -119,9 +127,9 @@
 	</tbody>
 	</table>
 
-	<script src="../../conf/reports/js/jquery-1.10.2.min.js"></script>
-    <script src="../../conf/reports/js/bootstrap.min.js"></script>
-	<script src="../../conf/reports/js/script.js"></script>
+	<script src="reports/js/jquery-1.10.2.min.js"></script>
+    <script src="reports/js/bootstrap.min.js"></script>
+	<script src="reports/js/script.js"></script>
 	
 </body>
 </html>

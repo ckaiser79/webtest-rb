@@ -11,8 +11,9 @@ main:
   archive:
     dir: ${machine-specific:apphome}/archive
     enabled: true
-  html_reports:
-    template_summary: ${machine-specific:apphome}/conf/reports/summary.template.html  
+  html-reports:
+    template-summary: ${machine-specific:apphome}/conf/reports/summary.template.html
+    resource-dir: ${machine-specific:apphome}/conf/reports
     auto-open: true
   testcase-directory: ${main:apphome}/testcases
   
