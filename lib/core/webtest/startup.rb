@@ -92,6 +92,30 @@ module Webtest
 		
 	end
 
+	class RunStaticics
+		
+		attr_reader :executed
+		attr_reader :succeeded
+		attr_reader :failed
+		
+		def initialize		
+			@executed = 0
+			@succeeded = 0
+			@failed = 0
+		end
+	
+		def incrSucceeded		
+			@executed = @executed + 1
+			@succeeded = @succeeded + 1
+		end
+		
+		def incrFailed
+			@executed = @executed + 1
+			@failed = @failed + 1
+		end
+	
+	end
+	
 	class Startup
 
 
@@ -102,6 +126,7 @@ module Webtest
 
 		def initialize
 			@config = WTAC.instance.config
+			@runStatistics = RunStaticics.new
 		end
 		
 		def run
@@ -127,6 +152,10 @@ module Webtest
 				
 			end
 
+			WTAC.instance.log.info("EXECUTED-TESTS: " + @runStatistics.executed.to_s)
+			WTAC.instance.log.info("SUCCEEDED-TESTS: " + @runStatistics.succeeded.to_s)
+			WTAC.instance.log.info("FAILED-TESTS: " + @runStatistics.failed.to_s)
+			
 			WTAC.instance.log.info("Generate HTML Report ")
 			HtmlReportGenerateService.new.generate
 			archiveResults
@@ -271,6 +300,8 @@ module Webtest
 					ac.log.error e.backtrace.join("\n")
 					@testrunnerEventLogger.onTestExecutionException testExecutionEventDto
 				end
+				
+				updateRunStatistics testrunner
 				ac.log.info("Finished execute test " + testrunner.to_s)
 			else
 				testcasesHome = ac.config.read("main:testcase-directory")
@@ -281,6 +312,14 @@ module Webtest
 		ensure
 			removeTestcaseLogger
 			logExecutionResult(testrunner)
+		end
+		
+		def updateRunStatistics testrunner
+			if testrunner.executionResult == 'SUCCESS'
+				@runStatistics.incrSucceeded
+			else
+				@runStatistics.incrFailed
+			end
 		end
 
 		def logExecutionResult(testrunner)
