@@ -10,7 +10,7 @@
 		<div class="navbar-inner">
 			<a class="brand" href="#">Filter</a>
 			<ul class="nav">
-				<li><a href="#" id="toggle-in">Incoming</a></li>
+				<!--<li><a href="#" id="toggle-in">Incoming</a></li>-->
 				<li><a href="#" id="toggle-out">Outgoing</a></li>
 				<li><a href="#" id="toggle-exclamation">Attention</a></li>
 				<li><a href="#" id="toggle-unknown">Unknown</a></li>
@@ -80,12 +80,11 @@
 	<% for @item in @data %>
 		<% for @event in @item.events %>
 
+		<% if @event.eventId.to_s != 'testexecution_begins' %>
 		<tr class="<%= @event.result %> <%= @event.eventId %>">
 			<td><input type="checkbox" class="reviewed"></td>
-			<td class="eventId">
-			<% if @event.eventId.to_s == 'testexecution_begins' %>
-			&gt;&gt;
-			<% elsif @event.eventId.to_s == 'testexecution_returns' %>
+			<td class="eventId">			
+			<% if @event.eventId.to_s == 'testexecution_returns' %>
 			&lt;&lt;
 			<% else %>
 			!!
@@ -121,7 +120,8 @@
 			<td class="result">
 			<%= @event.result %></td>
 		</tr>
-
+		<% end %>
+		
 		<% end %>
 	<% end %>
 	</tbody>
