@@ -19,7 +19,9 @@ module SZ
     end
 
     def key(key)
-      return @messageSource.read(@prefix + key)
+      value = @messageSource.read(@prefix + key)
+      WTAC.instance.log.info key + " = '" + value + "'"
+      value
     end
 
     alias :read :key

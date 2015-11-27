@@ -3,7 +3,10 @@
 <html>
 <head>
 
-	<link href="reports/css/bootstrap.css" rel="stylesheet">
+	<link href="reports/css/jquery.dataTables.min.css" rel="stylesheet">
+	<link href="reports/css/bootstrap.min.css" rel="stylesheet">
+	<link href="reports/css/bootstrap-responsive.min.css" rel="stylesheet">
+	<link href="reports/css/webtest-rb.css" rel="stylesheet">
 
 <body class="container">
 	<div class="navbar">
@@ -65,11 +68,10 @@
 	</div>
 		
 	
-	<table class="table table-striped table-hover">
+	<table class="table table-striped table-hover" id="results">
 	<thead>
 		<tr>
 			<th>&nbsp;</th>
-			<th>EVENT</th>
 			<th>Timestamp</th>
 			<th>TESTCASE</th>
 			<th>CONTEXT</th>
@@ -83,14 +85,7 @@
 		<% if @event.eventId.to_s != 'testexecution_begins' %>
 		<tr class="<%= @event.result %> <%= @event.eventId %>">
 			<td><input type="checkbox" class="reviewed"></td>
-			<td class="eventId">			
-			<% if @event.eventId.to_s == 'testexecution_returns' %>
-			&lt;&lt;
-			<% else %>
-			!!
-			<% end %>
-			
-			</td>
+
 			<td><%= @event.timestamp.strftime('%Y-%m-%d %H:%M:%S') %></td>
 			<td>
 				<% path = @item.source.gsub /.+\/last_run\//, '' %>
@@ -127,7 +122,8 @@
 	</tbody>
 	</table>
 
-	<script src="reports/js/jquery-1.10.2.min.js"></script>
+	<script src="reports/js/jquery.min.js"></script>
+	<script src="reports/js/jquery.dataTables.min.js"></script>
     <script src="reports/js/bootstrap.min.js"></script>
 	<script src="reports/js/script.js"></script>
 	

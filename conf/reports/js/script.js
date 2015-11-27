@@ -1,4 +1,5 @@
 $(function() {
+
     $(".eventId:contains('>>')").replaceWith("<td class='right'><i class='icon-chevron-right'></i></td>");
 	$(".eventId:contains('<<')").replaceWith("<td class='left'><i class='icon-chevron-left'></i></td>");
 	$(".eventId:contains('!!')").replaceWith("<td class='exclamation'><i class='icon-exclamation-sign'></i></td>");
@@ -41,5 +42,7 @@ $(function() {
 		$(this).parent().toggleClass("active");
 		$(".result").not(":contains('bug')").parent('tr').toggle();
 	});
-	
+
+	$('#results').DataTable();
+
 });
