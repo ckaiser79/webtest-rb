@@ -142,6 +142,9 @@ module Webtest
       advice.testcaseDir = @testcaseDir
       advice.onReturn
 
+      advice = DumpImageOnFailureAdvice.new
+      advice.onReturn
+
       advice = CloseBrowsersAdvice.new
       advice.onReturn
 
@@ -259,9 +262,21 @@ module Webtest
 
       if true?(config.read('browser-tests:autocloseBrowser'))
         BrowserInstanceService.instance.closeOwnBrowsers
+        BrowserInstanceService.instance.closeSharedBrowser
       end
     end
 
+  end
+
+  class DumpImageOnFailureAdvice
+
+    def onReturn(result = nil, error = nil)
+      BrowserInstanceService.instance.dump
+    end
+
+    def onThrows(error = nil)
+      BrowserInstanceService.instance.dump
+    end
   end
 
   class LogTestcaseSourcesAdvice

@@ -55,12 +55,23 @@ module Webtest
 				@lastBrowserInstance = nil
 			end
 		end
-		
+
 		def closeOwnBrowsers
 			@spawnedBrowsers.each do |browser|
 				if browser != nil and browser.exist?
 					browser.close
 				end
+			end
+		end
+
+		def dump
+			@spawnedBrowsers.each do |browser|
+				if browser != nil and browser.exist?
+					browser.dump
+				end
+			end
+			if sharedBrowserAvailable?
+				@lastBrowserInstance.dump
 			end
 		end
 		
@@ -70,14 +81,13 @@ module Webtest
 			return @lastBrowserInstance != nil && @lastBrowserInstance.exist?
 		end
 
+		# FIXME this doies not close the borwser automatically (e.g. chrome)
 		def createSelfDestructingBrowser
 			browser = createNewConfiguredBrowserInstance
 			
 			# close opened browsers if factory is destroyed
-			ObjectSpace.define_finalizer(self, proc { 
-				if browser != nil && browser.exist?
-					browser.close 
-				end
+			ObjectSpace.define_finalizer(self, proc {
+				browser.close if browser != nil
 			})
 			
 			return browser
