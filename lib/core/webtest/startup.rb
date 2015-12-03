@@ -257,7 +257,9 @@ module Webtest
 					
 				end
 			
-			end	
+			end
+			
+			BrowserInstanceService.instance.closeSharedBrowser if true?(config.read('browser-tests:autocloseBrowser'))
 			
 		end
 		
