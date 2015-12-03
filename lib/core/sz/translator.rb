@@ -20,7 +20,7 @@ module SZ
 
     def key(key)
       value = @messageSource.read(@prefix + key)
-      WTAC.instance.log.info key + " = '" + value + "'"
+      WTAC.instance.log.info key + " = '" + value.to_s + "'"
       value
     end
 
