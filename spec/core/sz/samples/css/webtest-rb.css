@@ -1,0 +1,14 @@
+body {
+	padding-top: 60px; /* 60px to make the container go all the way to the bottom of the topbar */
+	padding-left: 120px;
+}
+
+.events td { padding-left: 15px; }
+thead td { font-weight: bold; }
+
+.dataTables_length select {width: 120px;}
+table.dataTable tbody tr.fail {background-color: #ffb3b3;}
+.table-striped tbody > tr:nth-child(2n+1).fail > td {background-color: #ffe5e5;}
+
+table.dataTable tbody tr.success {background-color: #ddffcc; }
+.table-striped tbody > tr:nth-child(2n+1).success > td {background-color: #e5ffe5;}

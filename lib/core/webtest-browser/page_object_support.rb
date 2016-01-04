@@ -7,9 +7,14 @@ module Webtest
         @browser = browser
 
         name = self.class.to_s.gsub /::/,'-'
-        @browser.dump name + "-ctor"
-
-        raise "Invalid page content " + self.class.to_s if not correctBrowserContent?
+		
+		if not correctBrowserContent?
+			@browser.dump name + "-ctor-invalid-content"
+			raise "Invalid page content, see files '" + name + "-ctor-invalid-content'"
+		else
+			@browser.dump name + "-ctor"
+		end
+        
       end
 
       def correctBrowserContent?
@@ -22,14 +27,9 @@ module Webtest
 
       alias :browser :contentAsDriver
 
-      def wait(time)
-        time = time * 1000000
-        x = 0
-        while x < time do
-          x += 1
-        end
-      end
-
+	  # use sleep instead
+      #def wait(time)
+        
       def as(requestedType)
         return requestedType.new(@browser)
       end

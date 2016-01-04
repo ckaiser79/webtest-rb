@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+
+	<link href="css/jquery.dataTables.min.css" rel="stylesheet">
+	<link href="css/bootstrap.min.css" rel="stylesheet">
+	<link href="css/bootstrap-responsive.min.css" rel="stylesheet">
+	<link href="css/jquery.bxslider.css" rel="stylesheet">
+	<link href="css/webtest-rb.css" rel="stylesheet">
+
+<body class="container">
+	<div class="navbar">
+		<div class="navbar-inner">
+			<a class="brand" href="#">Filter</a>
+			<ul class="nav">
+				<li><a href="testcase.html">Home</a></li>
+				<li><a href="run.log">run.log</a></li>
+				<li><a href="rspec.html">RSpec results</a></li>
+				<li><a href="rspec-stderr.html">RSpec stderr</a></li>
+				<li><a href="rspec-stdout.html">RSpec stdout</a></li>
+				<li><a href="src/">Sources</a></li>
+			</ul>
+		</div>
+	</div>
+	
+	<h1>
+		<%= @data['tc-name'] %>
+	</h1>
+	
+	<div class="screenshots">
+		<ul class="slides">
+			<% for item in @data['images']
+			     name = item['name']
+				 image = item['image']
+				 source = item['source']
+			%>
+			<li><a href="<%= image %>" target="_blank">
+				<img src="<%= image %>" title="<%= name %> <a href='<%= source %>' target='_blank'>(SOURCE)</a>" />
+				</a>
+			</li>
+			<% end %>
+		</ul>
+		
+		
+	</div>	
+
+	<script src="js/jquery.min.js"></script>
+	<script src="js/jquery.dataTables.min.js"></script>
+    <script src="js/bootstrap.min.js"></script>
+	<script src="js/jquery.bxslider.min.js"></script>
+	<script src="js/script.js"></script>
+
+</body>
+</html>
+
+
+
