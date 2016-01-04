@@ -6,11 +6,11 @@ $(window).load(function() {
 	
 	$(document).keypress(function(k) { 
 		//alert(k.keyCode);
-		if(k.keyCode == 37) { //left
+		if(k.keyCode == 39) { //left
 			slider.goToNextSlide();
 		}
 		
-		if(k.keyCode == 39) { //right
+		if(k.keyCode == 37) { //right
 			slider.goToPrevSlide();
 		}
 	});
