@@ -10,6 +10,8 @@ require 'wtac'
 require 'sz/issue_definition_context'
 require 'pry'
 
+require 'cucumber_test_engine'
+
 module Webtest
 
   class RspecTestEngine
@@ -506,19 +508,21 @@ module Webtest
 
   end
 
+  # TODO add logic to decide which testengine should be used
   class ConfigureTestEngineAdvice
 
-    attr_reader :testEngine
     attr_writer :testcaseDir
     attr_writer :logDir
 
-    def initialize
-      @testEngine = Webtest::RspecTestEngine.new
+    def onBefore
+
     end
 
-    def onBefore
-      @testEngine.testcaseSpec = @testcaseDir + '/spec.rb'
-      @testEngine.logDir = @logDir
+    def testEngine
+      testEngine = Webtest::RspecTestEngine.new
+      testEngine.testcaseSpec = @testcaseDir + '/spec.rb'
+      testEngine.logDir = @logDir
+      testEngine
     end
   end
 
