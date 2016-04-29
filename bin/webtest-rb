@@ -1,7 +1,7 @@
 #!/usr/bin/env ruby
 
-$LOAD_PATH << '../lib/core'
-$LOAD_PATH << '../lib/vendor'
+$LOAD_PATH << '../lib/'
+$LOAD_PATH << '../vendor/lib'
 
 require 'optparse'
 require 'webtest'
@@ -34,15 +34,21 @@ def readCommandlineArguments
 			options[:config] = file
 		end
 		
-		options[:testcase] = nil
-		opts.on( '-t', '--testcase FILE', 'Load single testcase' ) do|file|
-			options[:testcase] = file
-		end
-		
 		options[:browser] = nil
 		opts.on( '-b', '--browser <ie|firefox|chrome>', 'Run testcase using this browser' ) do |type|
 			options[:browser] = type
 		end		
+		
+		options[:base_url] = nil
+		opts.on( '-s', '--base-url BASE-URL', 'The browser uses this value as the protocol://hostname part' ) do |base_url|
+			options[:base_url] = base_url
+		end		
+		
+		options[:include] = Array.new
+		opts.on( '-i', '--include-test-dir DIR', 'Use this testcase dir instead of configured one [0..n]' ) do |dir|
+			options[:include].push dir
+			options[:run_all] = true
+		end	
 		
 		options[:run_all] = false
 		opts.on( '-r', '--run-all', 'Run all selected testcases' ) do
@@ -122,14 +128,14 @@ if options[:browser] != nil
 	config.saveGlobalValue("browser-tests:browser-type", options[:browser])
 end
 
-if options[:testcase] != nil
-	config.saveGlobalValue("testrun:testcase", options[:testcase])
-else
-	config.saveGlobalValue("testrun:testcase", "<empty>")
+if not options[:include].empty?
+	config.saveGlobalValue("testrun:includes", options[:include])
 end
 
 config.saveGlobalValue("main:verbose", options[:verbose].to_s)
 config.saveGlobalValue("main:archive:name", options[:name].to_s)
+
+config.saveGlobalValue("browser-tests:baseUrl", options[:base_url].to_s) unless options[:base_url].nil?
 
 if options[:force] == true
 	config.saveGlobalValue("main:force-remove-lockfile", true)
