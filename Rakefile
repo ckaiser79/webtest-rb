@@ -10,7 +10,7 @@ task :default => :help
 task :package => [ :lgpl_prepare, :install ]
 
 task :help do
-	puts "rake <rm_logs|rm_vendor_files|install|package>"
+	puts "rake <rdoc|rm_logs|rm_vendor_files|install|package>"
 end
 
 task :lgpl_prepare => [ :rm_vendor_files, :rm_logs ]
@@ -18,18 +18,17 @@ task :lgpl_prepare => [ :rm_vendor_files, :rm_logs ]
 task :rm_logs do
 	FileUtils.rm_rf('log')
 	FileUtils.rm_rf('pckg')
+	FileUtils.rm_rf('generated')
 end
 
 task :rm_vendor_files do
-	FileUtils.rm_rf('lib/vendor')
-	FileUtils.rm_rf('spec/vendor')
-	FileUtils.rm_rf('bin-vendor')
+	FileUtils.rm_rf('vendor')
 end
 	
 task :install do
-	FileUtils.mkdir('lib/vendor')
-	FileUtils.mkdir('spec/vendor')
-	FileUtils.mkdir('bin-vendor')
+	FileUtils.mkdir('vendor/bin')
+	FileUtils.mkdir('vendor/lib')
+	FileUtils.mkdir('vendor/spec')	
 end
 
 RDoc::Task.new do |rdoc|
@@ -41,15 +40,16 @@ end
 	
 Rake::PackageTask.new(NAME, VERSION) do |p|
     p.need_tar = true
-    p.package_files.include("lib/**/*.rb")
+    p.package_files.include("lib/**/*")
 	p.package_files.include("spec/**/*")
 	p.package_files.include("bin/*")
 	p.package_files.include("conf/*")
 	
 	p.package_files.include("Rakefile")
+	p.package_files.include("Gemfile")
 	p.package_files.include("LICENSE.txt")
 	p.package_files.include("README.txt")
 	
-	p.package_files.include("testcases/**/*")
+	p.package_files.include("testcases/samples/**/*")
 end
 	

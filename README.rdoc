@@ -4,8 +4,6 @@
 Is a program to run automated browser end to end tests and present a 
 report including detailed informations and screenshots. It is based on 
 the selenium api. Tests are coded as rspec files.
-
-<em>Documentation is currently in work!</em>
  
 == USAGE 
 

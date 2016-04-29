@@ -18,6 +18,7 @@ gem 'nokogiri'
 # browser tests
 gem 'watir-webdriver'
 gem 'launchy'
+gem 'cucumber'
 
 # for interactive testing and debugging
 gem 'pry'
