@@ -33,12 +33,12 @@ def readCommandlineArguments
 		opts.on( '-c', '--config FILE', 'Load this configuration' ) do|file|
 			options[:config] = file
 		end
-		
+
 		options[:browser] = nil
 		opts.on( '-b', '--browser <ie|firefox|chrome>', 'Run testcase using this browser' ) do |type|
 			options[:browser] = type
 		end		
-		
+
 		options[:base_url] = nil
 		opts.on( '-s', '--base-url BASE-URL', 'The browser uses this value as the protocol://hostname part' ) do |base_url|
 			options[:base_url] = base_url
@@ -98,7 +98,7 @@ def initConfiguration(fileName)
 	yamlString = File.open(fileName)
 	@config = Webtest::Configuration.new
 
-	f = File.open(Dir.pwd + '/../lib/core/webtest/defaults-config.yml')
+	f = File.open(Dir.pwd + '/../lib/webtest/defaults-config.yml')
 	@config.loadApplicationDefaults(f)
 	@config.loadGlobal(yamlString)
 
