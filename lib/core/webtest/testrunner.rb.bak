@@ -144,13 +144,6 @@ module Webtest
       advice.testcaseDir = @testcaseDir
       advice.onReturn
 
-      advice = CreateTestcaseHtmlAdvice.new
-      advice.logDir = @logDir
-      advice.reportResourceDir = WTAC.instance.config.read('main:html-reports:resource-dir')
-      advice.testcaseTemplate = WTAC.instance.config.read('main:html-reports:template-testcase')
-      advice.name = File.basename(testcaseName) +  " [" + @executionResult.to_s + "]"
-      advice.onReturn
-
       advice = DumpImageOnFailureAdvice.new
       advice.onReturn
 
@@ -184,7 +177,7 @@ module Webtest
       else
         name = ""
       end
-      return testcaseName + name + " [" + @executionResult + "]"
+      return testcaseName() + name + " [" + @executionResult + "]"
     end
 
     def isContextAvailable
@@ -279,11 +272,11 @@ module Webtest
   class DumpImageOnFailureAdvice
 
     def onReturn(result = nil, error = nil)
-      BrowserInstanceService.instance.dump 'failed-testcase-last-browser-screenshot'
+      BrowserInstanceService.instance.dump
     end
 
     def onThrows(error = nil)
-      BrowserInstanceService.instance.dump 'failed-testcase-last-browser-screenshot'
+      BrowserInstanceService.instance.dump
     end
   end
 
@@ -308,60 +301,6 @@ module Webtest
         FileUtils.mkdir src
       end
       FileUtils.cp_r Dir.glob(@testcaseDir + '/*'), src
-    end
-
-  end
-
-  class CreateTestcaseHtmlAdvice
-
-    attr_writer :logDir
-    attr_writer :reportResourceDir
-    attr_writer :testcaseTemplate
-
-    attr_writer :name
-
-    def onReturn(result = nil, error = nil)
-      createHtmlReport
-    end
-
-    def onThrows(error = nil)
-      createHtmlReport
-    end
-
-    private
-
-    def createHtmlReport
-
-
-      d = Hash.new
-      d['tc-name'] = @name
-
-      d['images'] = Array.new
-      images = Dir.glob(@logDir + '/*.png')
-      images.each do |img|
-        r = Hash.new
-
-        fnam = File.basename img
-        extn = File.extname img
-        name = File.basename fnam, extn
-
-        r['name'] = name
-        r['image'] = fnam
-        r['source'] = name + '.html'
-
-        d['images'].push r
-      end
-
-      templateFile = @testcaseTemplate
-      destinationFile = @logDir + '/report.html'
-
-      service = SZ::YamlToTemplateRenderService.instance
-      service.renderAsFile(SZ::BindingContainer.new(d).exposeBinding, templateFile, destinationFile)
-
-      FileUtils.mkdir @logDir + '/js'
-      FileUtils.mkdir @logDir + '/css'
-      FileUtils.cp_r Dir.glob(@reportResourceDir + '/js/*'), @logDir + '/js'
-      FileUtils.cp_r Dir.glob(@reportResourceDir + '/css/*'), @logDir + '/css'
     end
 
   end

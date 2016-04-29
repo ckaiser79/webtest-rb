@@ -118,7 +118,6 @@ module Webtest
 
 		def dump(name = nil)
 
-		
 			filename = @filenameGenerateService.nextFilename "png", name
 			WTAC.instance.log.info('Dump page screenshot and source ' + filename)
 			

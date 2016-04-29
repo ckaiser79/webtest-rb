@@ -9,12 +9,22 @@
 	<link href="css/jquery.bxslider.css" rel="stylesheet">
 	<link href="css/webtest-rb.css" rel="stylesheet">
 
+	<script language="javascript" type="text/javascript">
+		function resizeIframe(obj) {
+		obj.style.height = obj.contentWindow.document.body.scrollHeight + 'px';
+		}
+	</script>
+	
+	<meta name="msapplication-TileColor" content="#000000">
+	<meta name="msapplication-TileImage" content="/favicon-32x32.png">
+	<meta name="theme-color" content="#000000">
+	
 <body class="container">
 	<div class="navbar">
 		<div class="navbar-inner">
-			<a class="brand" href="#">Filter</a>
+			<a class="brand" href=".">Directory</a>
 			<ul class="nav">
-				<li><a href="testcase.html">Home</a></li>
+				<li><a href="report.html">Home</a></li>
 				<li><a href="run.log">run.log</a></li>
 				<li><a href="rspec.html">RSpec results</a></li>
 				<li><a href="rspec-stderr.html">RSpec stderr</a></li>
@@ -41,15 +51,16 @@
 			</li>
 			<% end %>
 		</ul>
-		
-		
 	</div>	
 
+	
+	<iframe src="rspec.html" frameborder="0" scrolling="no" style="width: 100%" onload="resizeIframe(this)"></iframe>
+	
 	<script src="js/jquery.min.js"></script>
 	<script src="js/jquery.dataTables.min.js"></script>
     <script src="js/bootstrap.min.js"></script>
 	<script src="js/jquery.bxslider.min.js"></script>
-	<script src="js/script.js"></script>
+	<script src="js/script-tc.js"></script>
 
 </body>
 </html>

@@ -64,14 +64,14 @@ module Webtest
 			end
 		end
 
-		def dump
+		def dump name = nil
 			@spawnedBrowsers.each do |browser|
 				if browser != nil and browser.exist?
-					browser.dump
+					browser.dump name
 				end
 			end
 			if sharedBrowserAvailable?
-				@lastBrowserInstance.dump
+				@lastBrowserInstance.dump name
 			end
 		end
 		

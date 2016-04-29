@@ -8,6 +8,11 @@
 	<link href="reports/css/bootstrap-responsive.min.css" rel="stylesheet">
 	<link href="reports/css/webtest-rb.css" rel="stylesheet">
 
+	<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+	<meta name="msapplication-TileColor" content="#000000">
+	<meta name="msapplication-TileImage" content="/favicon-32x32.png">
+	<meta name="theme-color" content="#000000">
+	
 <body class="container">
 	<div class="navbar">
 		<div class="navbar-inner">
@@ -91,19 +96,11 @@
 				<% path = @item.source.gsub /.+\/last_run\//, '' %>
 	
 				<% if @item.context != 'unknown-context' %>
-				<a href="<%= path %>/<%= @item.context %>/" target="logs">
+				<a href="<%= path %>/<%= @item.context %>/report.html" target="logs">
 				<% else %>			
-				<a href="<%= path %>" target="logs">
+				<a href="<%= path %>/report.html" target="logs">
 				<% end %>
-				<%= @item.name %> 				
-				</a>, 	
-				
-				<% if @item.context != 'unknown-context' %>
-				<a href="<%= path %>/<%= @item.context %>/rspec.html" target="logs">
-				<% else %>			
-				<a href="<%= path %>/rspec.html" target="logs">
-				<% end %>
-				<span class="<%= @event.result %>">Details</span>
+				<span class="<%= @event.result %>"><%= @item.name %></span>
 				</a>
 			</td>
 			<td class="context">
