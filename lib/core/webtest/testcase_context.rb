@@ -47,7 +47,7 @@ module Webtest
     def loadLazyConfig
 
       return if @cfg != nil
-      raise "No configurationContext available" if @contextConfiguration == nil
+      raise "No configurationContext available " + to_s if @contextConfiguration == nil
 
       @cfg = Webtest::Configuration.new
       @cfg.setGlobal(@contextConfiguration)

@@ -92,14 +92,11 @@ module Webtest
     end
 
     def appendToLogfile(dto)
-      # FIXME implement function
 
       @store.transaction do
         @store['eventlog'].push dto
       end
 
-      #puts dto.to_s
-      #puts dto.to_yaml
     end
 
     def loadReturnCode
