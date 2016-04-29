@@ -10,7 +10,7 @@ require 'wtac'
 require 'sz/issue_definition_context'
 require 'pry'
 
-require 'cucumber_test_engine'
+require 'webtest/cucumber_test_engine'
 
 module Webtest
 

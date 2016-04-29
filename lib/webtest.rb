@@ -17,7 +17,7 @@ require 'webtest/logfile_result_printing_service'
 
 require 'webtest/testcase_locator_service'
 require 'webtest/rest-client'
-
+require 'webtest/cucumber_test_engine'
 
 
 module Webtest
