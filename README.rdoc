@@ -5,6 +5,10 @@ Is a program to run automated browser end to end tests and present a
 report including detailed informations and screenshots. It is based on 
 the selenium api. Tests are coded as rspec files.
  
+== DEPRECATION
+
+Since we do not use webtest-rb in our company anymore, I will not find the time to add new features and maintain this program. Feel free to use the existing sources for your needs.
+
 == USAGE 
 
 You can call the main exe like this:
